@@ -1,0 +1,373 @@
+---
+title: "faker.string — UUIDs, alphanumeric, and custom strings"
+description: "Generate UUIDs (v1–v9), nanoids, ULIDs, alphanumeric strings, hexadecimal, binary, octal, and character-set strings with faker.string. Part of SimpleFaker."
+---
+
+The `faker.string` module generates strings of all kinds — from plain alphabetical characters and digits to UUIDs, Nano IDs, and custom character sets. All methods are locale-independent.
+
+## Methods
+
+### alpha
+
+Generates a string consisting of letters in the English alphabet.
+
+<ParamField path="options.length" type="number | { min: number; max: number }">
+  Length of the string to generate (fixed or range). Defaults to `1`.
+</ParamField>
+
+<ParamField path="options.casing" type="'upper' | 'lower' | 'mixed'">
+  Casing of the generated characters. Defaults to `'mixed'`.
+</ParamField>
+
+<ParamField path="options.exclude" type="string | string[]">
+  Characters to exclude from the output. Defaults to `[]`.
+</ParamField>
+
+<CodeGroup>
+
+```javascript basic usage
+faker.string.alpha()
+// 'b'
+
+faker.string.alpha(10)
+// 'fEcAaCVbaR'
+
+faker.string.alpha({ length: { min: 5, max: 10 } })
+// 'HcVrCf'
+```
+
+```javascript with options
+faker.string.alpha({ casing: 'lower' })
+// 'r'
+
+faker.string.alpha({ exclude: ['W'] })
+// 'Z'
+
+faker.string.alpha({ length: 5, casing: 'upper', exclude: ['A'] })
+// 'DTCIC'
+```
+
+</CodeGroup>
+
+---
+
+### alphanumeric
+
+Generates a string consisting of letters and digits.
+
+<ParamField path="options.length" type="number | { min: number; max: number }">
+  Length of the string to generate (fixed or range). Defaults to `1`.
+</ParamField>
+
+<ParamField path="options.casing" type="'upper' | 'lower' | 'mixed'">
+  Casing of the letter characters. Defaults to `'mixed'`.
+</ParamField>
+
+<ParamField path="options.exclude" type="string | string[]">
+  Characters or digits to exclude. Defaults to `[]`.
+</ParamField>
+
+<CodeGroup>
+
+```javascript basic usage
+faker.string.alphanumeric()
+// '2'
+
+faker.string.alphanumeric(5)
+// '3e5V7'
+
+faker.string.alphanumeric({ length: { min: 5, max: 10 } })
+// 'muaApG'
+```
+
+```javascript with options
+faker.string.alphanumeric({ casing: 'upper' })
+// 'A'
+
+faker.string.alphanumeric({ exclude: ['W'] })
+// 'r'
+
+faker.string.alphanumeric({ length: 5, exclude: ['a'] })
+// 'x1Z7f'
+```
+
+</CodeGroup>
+
+---
+
+### binary
+
+Returns a binary string (characters `0` and `1`), optionally with a prefix.
+
+<ParamField path="options.length" type="number | { min: number; max: number }">
+  Length of the binary digits (excluding prefix). Defaults to `1`.
+</ParamField>
+
+<ParamField path="options.prefix" type="string">
+  Prefix prepended to the output. Defaults to `'0b'`.
+</ParamField>
+
+<Tip>
+  Use `faker.number.binary()` if you need a numeric binary value within a specific range rather than a string of a given length.
+</Tip>
+
+```javascript
+faker.string.binary()
+// '0b1'
+
+faker.string.binary({ length: 10 })
+// '0b1101011011'
+
+faker.string.binary({ length: { min: 5, max: 10 } })
+// '0b11101011'
+
+faker.string.binary({ length: 10, prefix: 'bin_' })
+// 'bin_1101011011'
+```
+
+---
+
+### hexadecimal
+
+Returns a hexadecimal string, optionally with a prefix and specific casing.
+
+<ParamField path="options.length" type="number | { min: number; max: number }">
+  Length of the hex digits (excluding prefix). Defaults to `1`.
+</ParamField>
+
+<ParamField path="options.casing" type="'upper' | 'lower' | 'mixed'">
+  Casing of the hex characters. Defaults to `'mixed'`.
+</ParamField>
+
+<ParamField path="options.prefix" type="string">
+  Prefix prepended to the output. Defaults to `'0x'`.
+</ParamField>
+
+```javascript
+faker.string.hexadecimal()
+// '0xB'
+
+faker.string.hexadecimal({ length: 10 })
+// '0xaE13d044cB'
+
+faker.string.hexadecimal({ casing: 'lower' })
+// '0xf'
+
+faker.string.hexadecimal({ length: 10, prefix: '#' })
+// '#f12a974eB1'
+
+faker.string.hexadecimal({ length: 10, casing: 'upper' })
+// '0xE3F38014FB'
+
+faker.string.hexadecimal({ casing: 'lower', prefix: '' })
+// 'd'
+```
+
+---
+
+### nanoid
+
+Generates a [Nano ID](https://github.com/ai/nanoid) — a compact URL-safe unique string using alphanumeric characters plus `_` and `-`.
+
+<ParamField path="length" type="number | { min: number; max: number }">
+  Length of the Nano ID to generate. Defaults to `21`.
+</ParamField>
+
+```javascript
+faker.string.nanoid()
+// 'ptL0KpX_yRMI98JFr6B3n'
+
+faker.string.nanoid(10)
+// 'VsvwSdm_Am'
+
+faker.string.nanoid({ min: 13, max: 37 })
+// 'KIRsdEL9jxVgqhBDlm'
+```
+
+---
+
+### numeric
+
+Generates a string of digits. Optionally allows control over leading zeros and excluded digits.
+
+<ParamField path="options.length" type="number | { min: number; max: number }">
+  Length of the numeric string. Defaults to `1`.
+</ParamField>
+
+<ParamField path="options.allowLeadingZeros" type="boolean">
+  Whether leading zeros are allowed. Defaults to `true`.
+</ParamField>
+
+<ParamField path="options.exclude" type="string | string[]">
+  Digits to exclude from the output. Defaults to `[]`.
+</ParamField>
+
+<Tip>
+  Use `faker.number.int()` if you need a numeric value within a range rather than a string of a given length.
+</Tip>
+
+```javascript
+faker.string.numeric()
+// '2'
+
+faker.string.numeric(5)
+// '31507'
+
+faker.string.numeric({ length: { min: 5, max: 10 } })
+// '197089478'
+
+faker.string.numeric({ length: 42, allowLeadingZeros: false })
+// '72564846278453876543517840713421451546115'
+
+faker.string.numeric({ length: 6, exclude: ['0'] })
+// '943228'
+```
+
+---
+
+### octal
+
+Returns an octal string (digits `0`–`7`), optionally with a prefix.
+
+<ParamField path="options.length" type="number | { min: number; max: number }">
+  Length of the octal digits (excluding prefix). Defaults to `1`.
+</ParamField>
+
+<ParamField path="options.prefix" type="string">
+  Prefix prepended to the output. Defaults to `'0o'`.
+</ParamField>
+
+```javascript
+faker.string.octal()
+// '0o3'
+
+faker.string.octal({ length: 10 })
+// '0o1526216210'
+
+faker.string.octal({ length: 10, prefix: 'oct_' })
+// 'oct_1542153414'
+```
+
+---
+
+### sample
+
+Returns a string of UTF-16 characters in the printable ASCII range (code points 33–125, `!` to `}`).
+
+<ParamField path="length" type="number | { min: number; max: number }">
+  Length of the string to generate. Defaults to `10`.
+</ParamField>
+
+```javascript
+faker.string.sample()
+// 'Zo!.:*e>wR'
+
+faker.string.sample(5)
+// '6Bye8'
+
+faker.string.sample({ min: 5, max: 10 })
+// 'FeKunG'
+```
+
+---
+
+### symbol
+
+Returns a string containing only special/punctuation characters.
+
+The available symbols are: `! " # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ { | } ~`
+
+<ParamField path="length" type="number | { min: number; max: number }">
+  Length of the symbol string. Defaults to `1`.
+</ParamField>
+
+```javascript
+faker.string.symbol()
+// '$'
+
+faker.string.symbol(5)
+// '#*!.~'
+
+faker.string.symbol({ min: 5, max: 10 })
+// ')|@*>^+'
+```
+
+---
+
+### ulid
+
+Returns a [ULID](https://github.com/ulid/spec) (Universally Unique Lexicographically Sortable Identifier). The first 10 characters encode the timestamp.
+
+<ParamField path="options.refDate" type="string | Date | number">
+  The reference date whose timestamp is encoded into the ULID. Defaults to `faker.defaultRefDate()`.
+</ParamField>
+
+```javascript
+faker.string.ulid()
+// '01ARZ3NDEKTSV4RRFFQ69G5FAV'
+
+faker.string.ulid({ refDate: '2020-01-01T00:00:00.000Z' })
+// '01DXF6DT00CX9QNNW7PNXQ3YR8'
+```
+
+---
+
+### uuid
+
+Returns a UUID (Universally Unique Identifier). Supports v4 (random) and v7 (time-ordered).
+
+<ParamField path="options.version" type="4 | 7">
+  The UUID version to generate. Defaults to `4`.
+</ParamField>
+
+<ParamField path="options.refDate" type="string | Date | number">
+  Timestamp to encode into the UUID. Only used for v7. Defaults to `faker.defaultRefDate()`.
+</ParamField>
+
+<CodeGroup>
+
+```javascript UUID v4 (default)
+faker.string.uuid()
+// '4136cd0b-d90b-4af7-b485-5d1ded8db252'
+
+faker.string.uuid({ version: 4 })
+// 'd5482c1f-c30d-4bbc-b151-d95145bae71b'
+```
+
+```javascript UUID v7 (time-ordered)
+faker.string.uuid({ version: 7 })
+// '01948b54-1b78-75fb-9922-0d9b0fd32248'
+
+faker.string.uuid({ version: 7, refDate: '2020-01-01T00:00:00.000Z' })
+// '016f5e66-e800-725e-b078-f413f23aaff0'
+```
+
+</CodeGroup>
+
+---
+
+### fromCharacters
+
+Generates a string from a custom set of characters.
+
+<ParamField path="characters" type="string | string[]">
+  The characters to draw from. If an array, each element is treated as a single character.
+</ParamField>
+
+<ParamField path="length" type="number | { min: number; max: number }">
+  Length of the resulting string. Defaults to `1`.
+</ParamField>
+
+```javascript
+faker.string.fromCharacters('abc')
+// 'c'
+
+faker.string.fromCharacters(['a', 'b', 'c'])
+// 'a'
+
+faker.string.fromCharacters('abc', 10)
+// 'cbbbacbacb'
+
+faker.string.fromCharacters('abc', { min: 5, max: 10 })
+// 'abcaaaba'
+```

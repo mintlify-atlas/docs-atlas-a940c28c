@@ -1,0 +1,397 @@
+---
+title: "faker.location — addresses, coordinates, and regions"
+description: "Generate street addresses, cities, states, countries, zip codes, GPS coordinates, time zones, and directions with faker.location. Locale-aware output."
+---
+
+The `faker.location` module generates realistic address and location data. Street addresses, cities, states, countries, zip codes, GPS coordinates, time zones, and directions are all available. Most methods are locale-aware, so they produce data appropriate for the current locale's country.
+
+<Note>
+Prior to Faker 8.0.0, this module was called `faker.address`. Update any existing references to `faker.location`.
+</Note>
+
+<Tip>
+For locale-specific address formats, use a localized Faker instance such as `fakerEN_US`, `fakerDE`, or `fakerEN_GB`. The default `faker` instance uses English (US) data.
+</Tip>
+
+## Street and building
+
+### buildingNumber
+
+Generates a random building number.
+
+**Returns:** `string`
+
+```typescript
+faker.location.buildingNumber()  // '379'
+```
+
+---
+
+### streetName
+
+Generates a random localized street name.
+
+**Returns:** `string`
+
+```typescript
+faker.location.street()  // 'Schroeder Isle'
+```
+
+---
+
+### streetAddress
+
+Generates a random localized street address. Optionally includes a secondary address component such as an apartment number.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="useFullAddress" type="boolean" default="false">
+      When `true`, appends a secondary address (e.g. apartment number) to the street address.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.location.streetAddress()                       // '0917 O\'Conner Estates'
+faker.location.streetAddress(false)                  // '34830 Erdman Hollow'
+faker.location.streetAddress(true)                   // '3393 Ronny Way Apt. 742'
+faker.location.streetAddress({ useFullAddress: true }) // '7917 Miller Park Apt. 410'
+```
+
+---
+
+### secondaryAddress
+
+Generates a random localized secondary address such as an apartment or room number.
+
+**Returns:** `string`
+
+```typescript
+faker.location.secondaryAddress()  // 'Apt. 861'
+```
+
+---
+
+## City, state, and country
+
+### city
+
+Generates a random localized city name.
+
+**Returns:** `string`
+
+```typescript
+faker.location.city()     // 'East Jarretmouth'
+fakerDE.location.city()   // 'Bad Lilianadorf'
+```
+
+---
+
+### state
+
+Returns a random localized state name, or equivalent first-level administrative entity (province, region, etc.).
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="abbreviated" type="boolean" default="false">
+      When `true`, returns the abbreviated form (e.g. `'LA'` instead of `'Louisiana'`).
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.location.state()                        // 'Mississippi'
+fakerEN_CA.location.state()                   // 'Saskatchewan'
+fakerDE.location.state()                      // 'Nordrhein-Westfalen'
+faker.location.state({ abbreviated: true })   // 'LA'
+```
+
+---
+
+### county
+
+Returns a random localized county or equivalent second-level administrative entity (district, department, etc.).
+
+**Returns:** `string`
+
+```typescript
+fakerEN_GB.location.county()  // 'Cambridgeshire'
+fakerEN_US.location.county()  // 'Monroe County'
+```
+
+---
+
+### country
+
+Returns a random country name.
+
+**Returns:** `string`
+
+```typescript
+faker.location.country()  // 'Greece'
+```
+
+---
+
+### countryCode
+
+Returns a random [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) country code.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="variant" type="'alpha-2' | 'alpha-3' | 'numeric'" default="'alpha-2'">
+      The code format to return:
+      - `'alpha-2'` — two-letter code (e.g. `'US'`)
+      - `'alpha-3'` — three-letter code (e.g. `'USA'`)
+      - `'numeric'` — numeric code (e.g. `'840'`)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.location.countryCode()                          // 'SJ'
+faker.location.countryCode('alpha-2')                 // 'GA'
+faker.location.countryCode('alpha-3')                 // 'TJK'
+faker.location.countryCode('numeric')                 // '528'
+faker.location.countryCode({ variant: 'alpha-3' })    // 'TJK'
+```
+
+---
+
+### zipCode
+
+Generates a random zip or postal code. Uses the locale's default format unless overridden.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="state" type="string">
+      A US state abbreviation. When provided, generates a zip code valid for that state. Throws if the current locale does not define `postcode_by_state`.
+    </ParamField>
+    <ParamField body="format" type="string">
+      A custom format string using `#` as a digit placeholder. Ignored when `state` is specified.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.location.zipCode()           // '17839'
+faker.location.zipCode('####')     // '6925'
+```
+
+---
+
+## Coordinates
+
+### latitude
+
+Generates a random latitude value.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="min" type="number" default="-90">
+      Lower bound for the generated value.
+    </ParamField>
+    <ParamField body="max" type="number" default="90">
+      Upper bound for the generated value.
+    </ParamField>
+    <ParamField body="precision" type="number" default="4">
+      Number of decimal places in the result.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `number`
+
+```typescript
+faker.location.latitude()                                    // -30.9501
+faker.location.latitude({ max: 10 })                         // 5.7225
+faker.location.latitude({ max: 10, min: -10 })               // -9.6273
+faker.location.latitude({ max: 10, min: -10, precision: 5 }) // 2.68452
+```
+
+---
+
+### longitude
+
+Generates a random longitude value.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="min" type="number" default="-180">
+      Lower bound for the generated value.
+    </ParamField>
+    <ParamField body="max" type="number" default="180">
+      Upper bound for the generated value.
+    </ParamField>
+    <ParamField body="precision" type="number" default="4">
+      Number of decimal places in the result.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `number`
+
+```typescript
+faker.location.longitude()                                    // -30.9501
+faker.location.longitude({ max: 10 })                         // 5.7225
+faker.location.longitude({ max: 10, min: -10 })               // -9.6273
+faker.location.longitude({ max: 10, min: -10, precision: 5 }) // 2.68452
+```
+
+---
+
+### nearbyGPSCoordinate
+
+Generates a random GPS coordinate within a given radius of an origin point.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="origin" type="[number, number]">
+      The `[latitude, longitude]` coordinate to generate near. If omitted, a fully random coordinate is returned.
+    </ParamField>
+    <ParamField body="radius" type="number" default="10">
+      Maximum distance from the origin. Interpreted as miles by default, or kilometers when `isMetric` is `true`.
+    </ParamField>
+    <ParamField body="isMetric" type="boolean" default="false">
+      When `true`, treats `radius` as kilometers.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `[latitude: number, longitude: number]`
+
+```typescript
+faker.location.nearbyGPSCoordinate()
+// [ 33.8475, -170.5953 ]
+
+faker.location.nearbyGPSCoordinate({ origin: [33, -170] })
+// [ 33.0165, -170.0636 ]
+
+faker.location.nearbyGPSCoordinate({ origin: [33, -170], radius: 1000, isMetric: true })
+// [ 37.9163, -179.2408 ]
+```
+
+---
+
+## Directions and time zones
+
+### timeZone
+
+Returns a random IANA time zone relevant to the current locale.
+
+**Returns:** `string`
+
+```typescript
+faker.location.timeZone()  // 'Pacific/Guam'
+```
+
+---
+
+### cardinalDirection
+
+Returns a random cardinal direction (north, south, east, west).
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="abbreviated" type="boolean" default="false">
+      When `true`, returns the abbreviated form (e.g. `'N'` instead of `'North'`).
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.location.cardinalDirection()                        // 'North'
+faker.location.cardinalDirection({ abbreviated: true })   // 'W'
+```
+
+---
+
+### ordinalDirection
+
+Returns a random ordinal direction (northeast, southwest, etc.).
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="abbreviated" type="boolean" default="false">
+      When `true`, returns the abbreviated form (e.g. `'SW'` instead of `'Southwest'`).
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.location.ordinalDirection()                        // 'Northeast'
+faker.location.ordinalDirection({ abbreviated: true })   // 'SW'
+```
+
+---
+
+## Examples
+
+<AccordionGroup>
+  <Accordion title="Generate a full mailing address">
+    ```typescript
+    import { fakerEN_US as faker } from '@faker-js/faker';
+
+    const address = {
+      street: faker.location.streetAddress(),
+      secondary: faker.location.secondaryAddress(),
+      city: faker.location.city(),
+      state: faker.location.state({ abbreviated: true }),
+      zip: faker.location.zipCode(),
+      country: faker.location.country(),
+    };
+
+    // {
+    //   street: '7917 Miller Park',
+    //   secondary: 'Apt. 410',
+    //   city: 'East Jarretmouth',
+    //   state: 'MI',
+    //   zip: '82180',
+    //   country: 'United States'
+    // }
+    ```
+  </Accordion>
+
+  <Accordion title="Generate GPS coordinates near a known point">
+    ```typescript
+    import { faker } from '@faker-js/faker';
+
+    // Generate 5 coordinates within 50km of London
+    const london: [number, number] = [51.5074, -0.1278];
+
+    const points = Array.from({ length: 5 }, () =>
+      faker.location.nearbyGPSCoordinate({
+        origin: london,
+        radius: 50,
+        isMetric: true,
+      })
+    );
+    ```
+  </Accordion>
+
+  <Accordion title="Use locale-specific addresses">
+    ```typescript
+    import { fakerDE, fakerZH_CN, fakerEN_GB } from '@faker-js/faker';
+
+    fakerDE.location.city()          // 'Bad Lilianadorf'
+    fakerDE.location.state()         // 'Nordrhein-Westfalen'
+
+    fakerEN_GB.location.county()     // 'Cambridgeshire'
+    fakerEN_GB.location.zipCode()    // 'ZH17 2SD'
+
+    fakerZH_CN.location.city()       // '贵原市'
+    ```
+  </Accordion>
+</AccordionGroup>

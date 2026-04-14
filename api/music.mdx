@@ -1,0 +1,65 @@
+---
+title: "faker.music — genres and song names"
+description: "Generate music genre names, song names, album titles, and artist names for media and streaming app testing with faker.music. All data types may be localized."
+---
+
+The `faker.music` module generates music-related content including genre names, song titles, album names, and artist names. All values may be localized.
+
+## genre()
+
+Returns a random music genre name.
+
+```typescript
+faker.music.genre()
+// 'Reggae'
+```
+
+## songName()
+
+Returns a random song title.
+
+```typescript
+faker.music.songName()
+// 'White Christmas'
+```
+
+## album()
+
+Returns a random album name.
+
+```typescript
+faker.music.album()
+// '1989'
+```
+
+## artist()
+
+Returns a random artist name.
+
+```typescript
+faker.music.artist()
+// 'The Beatles'
+```
+
+## Usage example
+
+```typescript
+import { faker } from '@faker-js/faker';
+
+// Generate a fake music library entry
+const track = {
+  title: faker.music.songName(),
+  artist: faker.music.artist(),
+  album: faker.music.album(),
+  genre: faker.music.genre(),
+  duration: `${faker.number.int({ min: 2, max: 7 })}:${faker.number.int({ min: 10, max: 59 })}`,
+};
+
+// {
+//   title: 'White Christmas',
+//   artist: 'The Beatles',
+//   album: '1989',
+//   genre: 'Reggae',
+//   duration: '4:32'
+// }
+```

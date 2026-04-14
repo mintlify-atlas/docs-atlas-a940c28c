@@ -1,0 +1,244 @@
+---
+title: "faker.number — integers, floats, and special values"
+description: "Generate random integers, floats, bigints, binary numbers, octal numbers, and hex values within configurable ranges with faker.number."
+---
+
+The `faker.number` module generates numeric values of all kinds. Bounds are inclusive unless otherwise noted, and all methods are locale-independent.
+
+## Methods
+
+### int
+
+Returns a single random integer between `0` and `Number.MAX_SAFE_INTEGER`, or within a specified range.
+
+<ParamField path="options.min" type="number">
+  Lower bound (inclusive). Defaults to `0`.
+</ParamField>
+
+<ParamField path="options.max" type="number">
+  Upper bound (inclusive). Defaults to `Number.MAX_SAFE_INTEGER`.
+</ParamField>
+
+<ParamField path="options.multipleOf" type="number">
+  Generated number will be a multiple of this value. Must be a positive integer. Defaults to `1`.
+</ParamField>
+
+<CodeGroup>
+
+```javascript basic usage
+faker.number.int()
+// 2900970162509863
+
+faker.number.int(100)
+// 52
+
+faker.number.int({ max: 100 })
+// 42
+```
+
+```javascript with range
+faker.number.int({ min: 10, max: 100 })
+// 57
+
+faker.number.int({ min: 10, max: 100, multipleOf: 10 })
+// 50
+```
+
+</CodeGroup>
+
+---
+
+### float
+
+Returns a random floating-point number. By default, the result is between `0.0` and `1.0` (exclusive upper bound). Use `fractionDigits` or `multipleOf` to control decimal precision.
+
+<ParamField path="options.min" type="number">
+  Lower bound (inclusive). Defaults to `0.0`.
+</ParamField>
+
+<ParamField path="options.max" type="number">
+  Upper bound. Exclusive unless `multipleOf` or `fractionDigits` are set. Defaults to `1.0`.
+</ParamField>
+
+<ParamField path="options.fractionDigits" type="number">
+  Maximum number of decimal places. Cannot be used together with `multipleOf`.
+</ParamField>
+
+<ParamField path="options.multipleOf" type="number">
+  Generated number will be a multiple of this value. Cannot be used together with `fractionDigits`.
+</ParamField>
+
+<CodeGroup>
+
+```javascript basic usage
+faker.number.float()
+// 0.5688541042618454
+
+faker.number.float(3)
+// 2.367973240558058
+
+faker.number.float({ min: 20, max: 30 })
+// 23.94764115102589
+```
+
+```javascript controlling precision
+faker.number.float({ fractionDigits: 1 })
+// 0.9
+
+faker.number.float({ min: 10, max: 100, fractionDigits: 3 })
+// 65.716
+
+faker.number.float({ multipleOf: 0.25, min: 0, max: 10 })
+// 7.75
+
+faker.number.float({ min: 10, max: 100, multipleOf: 0.02 })
+// 35.42
+```
+
+</CodeGroup>
+
+---
+
+### bigInt
+
+Returns a random [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#bigint_type) value. The bounds are inclusive.
+
+<ParamField path="options.min" type="bigint | number | string | boolean">
+  Lower bound. Defaults to `0n`.
+</ParamField>
+
+<ParamField path="options.max" type="bigint | number | string | boolean">
+  Upper bound. Defaults to `min + 999999999999999n`.
+</ParamField>
+
+<ParamField path="options.multipleOf" type="bigint | number | string | boolean">
+  Generated value will be a multiple of this. Defaults to `1n`.
+</ParamField>
+
+```javascript
+faker.number.bigInt()
+// 55422n
+
+faker.number.bigInt(100n)
+// 52n
+
+faker.number.bigInt({ min: 1000000n })
+// 431433n
+
+faker.number.bigInt({ max: 100n })
+// 42n
+
+faker.number.bigInt({ multipleOf: 7n })
+// 35n
+
+faker.number.bigInt({ min: 10n, max: 100n })
+// 36n
+```
+
+---
+
+### binary
+
+Returns a binary representation (base-2) of a random integer within the given range. Returns a string.
+
+<ParamField path="options.min" type="number">
+  Lower bound (inclusive). Defaults to `0`.
+</ParamField>
+
+<ParamField path="options.max" type="number">
+  Upper bound (inclusive). Defaults to `1`.
+</ParamField>
+
+<Tip>
+  Use `faker.string.binary()` if you need a binary string of a specific character length rather than a number within a range.
+</Tip>
+
+```javascript
+faker.number.binary()
+// '1'
+
+faker.number.binary(255)
+// '110101'
+
+faker.number.binary({ min: 0, max: 65535 })
+// '10110101'
+```
+
+---
+
+### octal
+
+Returns an octal representation (base-8) of a random integer within the given range. Returns a string.
+
+<ParamField path="options.min" type="number">
+  Lower bound (inclusive). Defaults to `0`.
+</ParamField>
+
+<ParamField path="options.max" type="number">
+  Upper bound (inclusive). Defaults to `7`.
+</ParamField>
+
+<Tip>
+  Use `faker.string.octal()` if you need an octal string of a specific character length rather than a number within a range.
+</Tip>
+
+```javascript
+faker.number.octal()
+// '5'
+
+faker.number.octal(255)
+// '377'
+
+faker.number.octal({ min: 0, max: 65535 })
+// '4766'
+```
+
+---
+
+### hex
+
+Returns a lowercase hexadecimal representation of a random integer within the given range. Returns a string.
+
+<ParamField path="options.min" type="number">
+  Lower bound (inclusive). Defaults to `0`.
+</ParamField>
+
+<ParamField path="options.max" type="number">
+  Upper bound (inclusive). Defaults to `15`.
+</ParamField>
+
+```javascript
+faker.number.hex()
+// 'b'
+
+faker.number.hex(255)
+// '9d'
+
+faker.number.hex({ min: 0, max: 65535 })
+// 'af17'
+```
+
+---
+
+### romanNumeral
+
+Returns a Roman numeral string for a random integer in the given range. Valid range is 1–3999.
+
+<ParamField path="options.min" type="number">
+  Lower bound (inclusive). Defaults to `1`.
+</ParamField>
+
+<ParamField path="options.max" type="number">
+  Upper bound (inclusive). Defaults to `3999`.
+</ParamField>
+
+```javascript
+faker.number.romanNumeral()
+// 'CMXCIII'
+
+faker.number.romanNumeral(5)
+// 'III'
+
+faker.number.romanNumeral({ min: 5, max: 10 })
+// 'VII'
+```

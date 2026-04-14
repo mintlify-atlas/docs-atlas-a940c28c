@@ -1,0 +1,143 @@
+---
+title: "faker.company — company names and business phrases"
+description: "Generate realistic company names, catch phrases, buzz phrases, and their individual components (adjectives, nouns, verbs) with faker.company."
+---
+
+The `faker.company` module generates business-related strings. Use it to populate CRM fixtures, seed company directories, and generate placeholder content for enterprise UI testing.
+
+<Columns cols={2}>
+  <Card title="faker.commerce" icon="shopping-cart" href="/api/commerce">
+    Product names, prices, departments, and ISBNs.
+  </Card>
+  <Card title="faker.finance" icon="dollar-sign" href="/api/finance">
+    Account numbers, IBANs, currencies, and crypto addresses.
+  </Card>
+</Columns>
+
+---
+
+## name()
+
+Generates a random company name. This method is localized — the output format and name patterns vary by locale.
+
+```typescript
+faker.company.name() // 'Zieme, Hauck and McClure'
+```
+
+---
+
+## catchPhrase()
+
+Generates a full catch phrase suitable for display to an end user. The phrase is assembled from an adjective, a descriptor, and a noun.
+
+```typescript
+faker.company.catchPhrase() // 'Upgradable systematic flexibility'
+```
+
+---
+
+## buzzPhrase()
+
+Generates a buzz phrase in the style of corporate management speak. Composed of a verb, an adjective, and a noun.
+
+```typescript
+faker.company.buzzPhrase() // 'cultivate synergistic e-markets'
+```
+
+<Tip>
+Use `catchPhrase()` for user-facing marketing text and `buzzPhrase()` for internal business jargon scenarios.
+</Tip>
+
+---
+
+## catchPhraseAdjective()
+
+Returns a single adjective component of a catch phrase.
+
+```typescript
+faker.company.catchPhraseAdjective() // 'Multi-tiered'
+```
+
+---
+
+## catchPhraseDescriptor()
+
+Returns a single descriptor component of a catch phrase.
+
+```typescript
+faker.company.catchPhraseDescriptor() // 'composite'
+```
+
+---
+
+## catchPhraseNoun()
+
+Returns a single noun component of a catch phrase.
+
+```typescript
+faker.company.catchPhraseNoun() // 'leverage'
+```
+
+---
+
+## buzzAdjective()
+
+Returns a single buzz adjective used in corporate phrases.
+
+```typescript
+faker.company.buzzAdjective() // 'one-to-one'
+```
+
+---
+
+## buzzVerb()
+
+Returns a single buzz verb used in corporate phrases.
+
+```typescript
+faker.company.buzzVerb() // 'empower'
+```
+
+---
+
+## buzzNoun()
+
+Returns a single buzz noun used in corporate phrases.
+
+```typescript
+faker.company.buzzNoun() // 'paradigms'
+```
+
+---
+
+## Building phrases manually
+
+You can combine the component methods to build custom phrase structures:
+
+<AccordionGroup>
+  <Accordion title="Custom catch phrase format">
+
+```typescript
+const phrase = [
+  faker.company.catchPhraseAdjective(),
+  faker.company.catchPhraseNoun(),
+  faker.company.catchPhraseDescriptor(),
+].join(' ');
+// 'Robust leverage composite'
+```
+
+  </Accordion>
+
+  <Accordion title="Custom buzz phrase format">
+
+```typescript
+const buzz = [
+  faker.company.buzzAdjective(),
+  faker.company.buzzVerb(),
+  faker.company.buzzNoun(),
+].join(' ');
+// 'one-to-one empower paradigms'
+```
+
+  </Accordion>
+</AccordionGroup>

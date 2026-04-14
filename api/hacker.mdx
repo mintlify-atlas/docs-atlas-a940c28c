@@ -1,0 +1,81 @@
+---
+title: "faker.hacker — tech jargon and buzzphrases"
+description: "Generate tech jargon phrases, abbreviations, adjectives, nouns, verbs, and ingverbs for populating developer-flavored placeholder content with faker.hacker."
+---
+
+The `faker.hacker` module generates technology-flavored vocabulary: abbreviations, adjectives, nouns, verbs, and longer buzzphrases. It's useful for populating dev-themed UIs, changelogs, error messages, and commit message mocks.
+
+## phrase()
+
+Returns a randomly assembled hacker-speak sentence.
+
+```typescript
+faker.hacker.phrase()
+// 'If we override the card, we can get to the HDD feed through the back-end HDD sensor!'
+```
+
+## abbreviation()
+
+Returns a random IT or tech abbreviation.
+
+```typescript
+faker.hacker.abbreviation()
+// 'THX'
+```
+
+## adjective()
+
+Returns a random tech-flavored adjective.
+
+```typescript
+faker.hacker.adjective()
+// 'cross-platform'
+```
+
+## noun()
+
+Returns a random tech-flavored noun.
+
+```typescript
+faker.hacker.noun()
+// 'system'
+```
+
+## verb()
+
+Returns a random tech-flavored verb.
+
+```typescript
+faker.hacker.verb()
+// 'copy'
+```
+
+## ingverb()
+
+Returns a random tech-flavored present-participle verb (verb + -ing suffix).
+
+```typescript
+faker.hacker.ingverb()
+// 'navigating'
+```
+
+## Usage example
+
+```typescript
+import { faker } from '@faker-js/faker';
+
+// Simulate a loading message in a developer tool
+const loadingMessages = Array.from({ length: 3 }, () =>
+  `${faker.hacker.ingverb()} ${faker.hacker.adjective()} ${faker.hacker.noun()}...`
+);
+
+// [
+//   'navigating cross-platform system...',
+//   'copying redundant protocol...',
+//   'bypassing open-source interface...'
+// ]
+```
+
+<Tip>
+`faker.git.commitMessage()` uses `hacker.verb()`, `hacker.adjective()`, and `hacker.noun()` internally — you can use the same building blocks to generate custom commit-style messages.
+</Tip>

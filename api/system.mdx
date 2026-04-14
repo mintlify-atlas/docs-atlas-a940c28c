@@ -1,0 +1,200 @@
+---
+title: "faker.system — file names, MIME types, and paths"
+description: "Generate file names, extensions, MIME types, file paths, directory paths, semver strings, network interface names, and cron expressions with faker.system."
+---
+
+The `faker.system` module generates computer system-related data: file names, extensions, MIME types, directory paths, full file paths, semantic version strings, network interface names, and cron expressions.
+
+## fileName()
+
+Returns a random file name with one or more extensions. The base name is derived from random words joined with underscores.
+
+<ParamField body="extensionCount" type="number | { min: number; max: number }" default="1">
+  How many file extensions to append. Pass a range object to randomize the count.
+</ParamField>
+
+```typescript
+faker.system.fileName()
+// 'faithfully_calculating.u8mdn'
+
+faker.system.fileName({ extensionCount: 2 })
+// 'times_after.swf.ntf'
+
+faker.system.fileName({ extensionCount: { min: 1, max: 2 } })
+// 'jaywalk_like_ill.osfpvg'
+```
+
+## commonFileName()
+
+Returns a file name with a commonly used extension (`pdf`, `jpg`, `gif`, `mp4`, etc.). Optionally specify the extension directly.
+
+<ParamField body="ext" type="string">
+  The file extension to use. If omitted, a common extension is chosen randomly.
+</ParamField>
+
+```typescript
+faker.system.commonFileName()
+// 'dollar.jpg'
+
+faker.system.commonFileName('txt')
+// 'global_borders_wyoming.txt'
+```
+
+## fileExt()
+
+Returns a random file extension. If a MIME type is provided, the extension is valid for that type.
+
+<ParamField body="mimeType" type="string">
+  A valid MIME type string. When provided, the returned extension is specific to that MIME type.
+</ParamField>
+
+```typescript
+faker.system.fileExt()
+// 'emf'
+
+faker.system.fileExt('application/json')
+// 'json'
+```
+
+## mimeType()
+
+Returns a random MIME type string from the full IANA list.
+
+```typescript
+faker.system.mimeType()
+// 'video/vnd.vivo'
+```
+
+## commonFileType()
+
+Returns one of the five common file type categories: `video`, `audio`, `image`, `text`, or `application`.
+
+```typescript
+faker.system.commonFileType()
+// 'audio'
+```
+
+## fileType()
+
+Returns a random file type derived from the first segment of a MIME type (e.g. `message`, `font`, `model`).
+
+```typescript
+faker.system.fileType()
+// 'message'
+```
+
+## filePath()
+
+Returns a random absolute file path combining a directory path and a generated file name.
+
+```typescript
+faker.system.filePath()
+// '/usr/local/src/money.dotx'
+```
+
+## directoryPath()
+
+Returns a random absolute Unix-style directory path.
+
+```typescript
+faker.system.directoryPath()
+// '/etc/mail'
+```
+
+## semver()
+
+Returns a random [semantic version](https://semver.org) string in `major.minor.patch` format.
+
+```typescript
+faker.system.semver()
+// '1.15.2'
+```
+
+## networkInterface()
+
+Returns a random Linux predictable network interface name.
+
+<ParamField body="interfaceType" type="'en' | 'wl' | 'ww'">
+  The interface type prefix. `en` for Ethernet, `wl` for wireless LAN, `ww` for wireless WAN. Defaults to a random value.
+</ParamField>
+
+<ParamField body="interfaceSchema" type="'index' | 'slot' | 'mac' | 'pci'">
+  The naming schema. Controls the suffix format:
+  - `index` — single numeric index (e.g. `eno1`)
+  - `slot` — slot number with optional function/device (e.g. `ens3f1`)
+  - `mac` — MAC address suffix (e.g. `enx000c29c00000`)
+  - `pci` — PCI bus address (e.g. `enp5s0f1d0`)
+
+  Defaults to a random schema.
+</ParamField>
+
+```typescript
+faker.system.networkInterface()
+// 'enp0s3'
+
+faker.system.networkInterface({ interfaceType: 'wl' })
+// 'wlo1'
+
+faker.system.networkInterface({ interfaceSchema: 'mac' })
+// 'enx000c29c00000'
+
+faker.system.networkInterface({ interfaceType: 'en', interfaceSchema: 'pci' })
+// 'enp5s0f1d0'
+```
+
+## commonFileExt()
+
+Returns a commonly used file extension.
+
+```typescript
+faker.system.commonFileExt() // 'pdf'
+faker.system.commonFileExt() // 'png'
+```
+
+---
+
+## cron()
+
+Returns a random cron expression.
+
+<ParamField body="includeYear" type="boolean" default="false">
+  Whether to include a year field in the expression.
+</ParamField>
+
+<ParamField body="includeNonStandard" type="boolean" default="false">
+  Whether to include non-standard labels such as `@yearly`, `@monthly`, `@daily`.
+</ParamField>
+
+```typescript
+faker.system.cron()
+// '45 23 * * 6'
+
+faker.system.cron({ includeYear: true })
+// '45 23 * * 6 2067'
+
+faker.system.cron({ includeNonStandard: true })
+// '@yearly'
+```
+
+---
+
+## Usage example
+
+```typescript
+import { faker } from '@faker-js/faker';
+
+// Generate a fake uploaded file record
+const upload = {
+  originalName: faker.system.commonFileName(),
+  mimeType: faker.system.mimeType(),
+  size: faker.number.int({ min: 1024, max: 10_485_760 }),
+  path: faker.system.filePath(),
+};
+
+// {
+//   originalName: 'report.pdf',
+//   mimeType: 'application/pdf',
+//   size: 4823100,
+//   path: '/usr/local/src/report.pdf'
+// }
+```

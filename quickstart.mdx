@@ -1,80 +1,149 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: "Get started with Faker"
+description: "Install @faker-js/faker and generate your first realistic fake data in minutes. Covers ESM and CJS imports, locale selection, seeding, and factory functions."
 ---
 
-## Get started in three steps
+Faker is installed as a development dependency. This guide walks you through installation, basic usage, locale selection, seeding for reproducible results, and building factory functions for complex objects.
 
-Get your documentation site running locally and make your first customization.
+<Steps>
+  <Step title="Install the package">
+    Install `@faker-js/faker` using your preferred package manager.
 
-### Step 1: Set up your local environment
+    <CodeGroup>
+      ```bash npm
+      npm install --save-dev @faker-js/faker
+      ```
+      ```bash pnpm
+      pnpm add --save-dev @faker-js/faker
+      ```
+      ```bash yarn
+      yarn add --dev @faker-js/faker
+      ```
+    </CodeGroup>
+  </Step>
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+  <Step title="Generate your first fake data">
+    Import `faker` and call any of its module methods to generate data.
 
-### Step 2: Deploy your changes
+    ```typescript
+    import { faker } from '@faker-js/faker';
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    const user = {
+      userId: faker.string.uuid(),
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      avatar: faker.image.avatar(),
+      birthdate: faker.date.birthdate(),
+      registeredAt: faker.date.past(),
+    };
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+    console.log(user);
+    ```
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+    Each call returns a freshly generated random value. Run the script multiple times and you will get different results each time.
+  </Step>
 
-### Step 3: Go live
+  <Step title="Use a locale">
+    The default `faker` instance generates English data. To generate locale-specific values, import a pre-configured locale instance.
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+    ```typescript
+    import { fakerDE as faker } from '@faker-js/faker';
+
+    faker.person.firstName(); // 'Lena'
+    faker.location.city();    // 'München'
+    ```
+
+    Over 70 locale instances are available, named after their [BCP 47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag — for example `fakerFR`, `fakerJA`, `fakerPT_BR`. See the [Localization guide](/guides/localization) for the full list.
+  </Step>
+
+  <Step title="Seed for reproducible results">
+    By default, Faker produces a different value on every run. To get the same value every time — useful for snapshot tests — call `faker.seed()` with a fixed integer before generating data.
+
+    ```typescript
+    import { faker } from '@faker-js/faker';
+
+    faker.seed(123);
+
+    const firstRun = faker.number.int(); // always the same value
+
+    // Resetting the seed restarts the sequence from the beginning.
+    faker.seed(123);
+
+    const secondRun = faker.number.int();
+
+    console.log(firstRun === secondRun); // true
+    ```
+
+    <Note>
+      Seeded output may change between major Faker versions if the underlying locale data changes. Pin your Faker version in `package.json` if exact reproducibility across upgrades is required.
+    </Note>
+  </Step>
+</Steps>
+
+## Creating complex objects
+
+Faker generates values for individual primitives. For structured objects, write a factory function that calls multiple Faker methods and returns a typed record.
+
+The example below shows how to build a `createRandomUser` factory. It generates consistent related values by deriving `firstName`, `lastName`, and `email` in the correct order so the email address reflects the person's name.
+
+```typescript
+import { faker } from '@faker-js/faker';
+import type { SexType } from '@faker-js/faker';
+
+type SubscriptionTier = 'free' | 'basic' | 'business';
+
+interface User {
+  _id: string;
+  avatar: string;
+  birthday: Date;
+  email: string;
+  firstName: string;
+  lastName: string;
+  sex: SexType;
+  subscriptionTier: SubscriptionTier;
+}
+
+function createRandomUser(): User {
+  const sex = faker.person.sexType();
+  const firstName = faker.person.firstName(sex);
+  const lastName = faker.person.lastName();
+  const email = faker.internet.email({ firstName, lastName });
+
+  return {
+    _id: faker.string.uuid(),
+    avatar: faker.image.avatar(),
+    birthday: faker.date.birthdate(),
+    email,
+    firstName,
+    lastName,
+    sex,
+    subscriptionTier: faker.helpers.arrayElement(['free', 'basic', 'business']),
+  };
+}
+
+const user = createRandomUser();
+```
+
+To generate a list of users, use `faker.helpers.multiple`:
+
+```typescript
+const users = faker.helpers.multiple(createRandomUser, { count: 10 });
+```
+
+<Tip>
+  Add an optional `overwrites` parameter to your factory function to allow individual properties to be overridden in tests. This lets you control just the values relevant to a given test case without having to construct the full object by hand.
+</Tip>
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+<CardGroup cols={3}>
+  <Card title="Usage guide" icon="book-open" href="/guides/usage">
+    Deep-dive into advanced patterns: overwrites, `simpleFaker`, browser usage, and TypeScript configuration.
+  </Card>
+  <Card title="Localization" icon="language" href="/guides/localization">
+    Browse all 70+ supported locales and learn how to compose custom locale instances.
+  </Card>
+  <Card title="API reference" icon="code" href="/api/faker">
+    Explore every module and method with type signatures and live examples.
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

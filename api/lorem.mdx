@@ -1,0 +1,225 @@
+---
+title: "faker.lorem — placeholder text and paragraphs"
+description: "Generate lorem ipsum-style placeholder words, sentences, paragraphs, lines, and slugs for UI mockups and content testing with faker.lorem."
+---
+
+`faker.lorem` generates dummy content using traditional faux-Latin lorem ipsum text. Methods are ordered from smallest unit to largest: a single word all the way up to multiple paragraphs. Use `text()` when you want a random amount of content without picking a specific method.
+
+## word()
+
+Returns a single lorem ipsum word. Pass a number or options object to control the word length.
+
+```typescript
+faker.lorem.word()                                        // 'temporibus'
+faker.lorem.word(5)                                       // 'velit'
+faker.lorem.word({ strategy: 'shortest' })                // 'a'
+faker.lorem.word({ length: { min: 5, max: 7 }, strategy: 'fail' }) // 'quaerat'
+```
+
+### Parameters
+
+<ParamField body="options" type="number | object">
+  Pass a number as a shorthand for `{ length: number }`, or pass an options object.
+</ParamField>
+
+<ParamField body="options.length" type="number | { min: number; max: number }">
+  The exact length of the word, or a min/max range. Defaults to any length.
+</ParamField>
+
+<ParamField body="options.strategy" type="string" default="'any-length'">
+  How to handle cases where no word matches the requested length.
+
+  - `'fail'` — throws an error
+  - `'closest'` — returns the word closest to the requested length
+  - `'shortest'` — returns the shortest available word
+  - `'longest'` — returns the longest available word
+  - `'any-length'` — returns a word of any length
+</ParamField>
+
+---
+
+## words()
+
+Returns a space-separated string of lorem ipsum words. Defaults to 3 words.
+
+```typescript
+faker.lorem.words()                    // 'qui praesentium pariatur'
+faker.lorem.words(10)                  // 'debitis consectetur voluptatem non doloremque ipsum autem totam eum ratione'
+faker.lorem.words({ min: 1, max: 3 }) // 'tenetur error cum'
+```
+
+### Parameters
+
+<ParamField body="wordCount" type="number | { min: number; max: number }" default="3">
+  The number of words to generate, or a min/max range.
+</ParamField>
+
+---
+
+## sentence()
+
+Returns a sentence: words with an initial capital letter and a trailing period. Defaults to 3–10 words.
+
+```typescript
+faker.lorem.sentence()                    // 'Voluptatum cupiditate suscipit autem eveniet aut dolorem aut officiis distinctio.'
+faker.lorem.sentence(5)                   // 'Laborum voluptatem officiis est et.'
+faker.lorem.sentence({ min: 3, max: 5 }) // 'Fugiat repellendus nisi.'
+```
+
+### Parameters
+
+<ParamField body="wordCount" type="number | { min: number; max: number }" default="{ min: 3, max: 10 }">
+  The number of words in the sentence, or a min/max range.
+</ParamField>
+
+---
+
+## sentences()
+
+Returns multiple sentences joined by a separator. Defaults to 2–6 sentences separated by a space.
+
+```typescript
+faker.lorem.sentences()
+// 'Iste molestiae incidunt aliquam possimus reprehenderit eum corrupti. Deleniti modi voluptatem nostrum ut esse.'
+
+faker.lorem.sentences(2)
+// 'Maxime vel numquam quibusdam. Dignissimos ex molestias quos aut molestiae quam nihil occaecati maiores.'
+
+faker.lorem.sentences(2, '\n')
+// 'Et rerum a unde tempora magnam sit nisi.
+// Et perspiciatis ipsam omnis.'
+
+faker.lorem.sentences({ min: 1, max: 3 })
+// 'Placeat ex natus tenetur repellendus repellendus iste. Optio nostrum veritatis.'
+```
+
+### Parameters
+
+<ParamField body="sentenceCount" type="number | { min: number; max: number }" default="{ min: 2, max: 6 }">
+  The number of sentences to generate, or a min/max range.
+</ParamField>
+
+<ParamField body="separator" type="string" default="' '">
+  The string inserted between sentences.
+</ParamField>
+
+---
+
+## paragraph()
+
+Returns a single paragraph: multiple sentences joined by spaces. Defaults to 3 sentences.
+
+```typescript
+faker.lorem.paragraph()
+// 'Non architecto nam unde sint. Ex tenetur dolor facere optio aut consequatur. Ea laudantium reiciendis repellendus.'
+
+faker.lorem.paragraph(2)
+// 'Animi possimus nemo consequuntur ut ea et tempore unde qui. Quis corporis esse occaecati.'
+
+faker.lorem.paragraph({ min: 1, max: 3 })
+// 'Quis doloribus necessitatibus sint. Rerum accusamus impedit corporis porro.'
+```
+
+### Parameters
+
+<ParamField body="sentenceCount" type="number | { min: number; max: number }" default="3">
+  The number of sentences in the paragraph, or a min/max range.
+</ParamField>
+
+---
+
+## paragraphs()
+
+Returns multiple paragraphs joined by a separator. Defaults to 3 paragraphs separated by `'\n'`.
+
+```typescript
+faker.lorem.paragraphs()
+// 'Beatae voluptatem dicta et assumenda fugit eaque quidem consequatur...
+// Voluptatibus quo pariatur est...
+// Sapiente deleniti et.'
+
+faker.lorem.paragraphs(2, '<br/>\n')
+// 'Eos magnam aut qui accusamus...<br/>
+// Nihil quis vel consequatur...'
+
+faker.lorem.paragraphs({ min: 1, max: 3 })
+// 'Eum nam fugiat laudantium.
+// Dignissimos tempore porro necessitatibus commodi nam.'
+```
+
+### Parameters
+
+<ParamField body="paragraphCount" type="number | { min: number; max: number }" default="3">
+  The number of paragraphs to generate, or a min/max range.
+</ParamField>
+
+<ParamField body="separator" type="string" default="'\n'">
+  The string inserted between paragraphs.
+</ParamField>
+
+---
+
+## text()
+
+Returns a random amount of lorem ipsum content by randomly invoking one of `sentence()`, `sentences()`, `paragraph()`, `paragraphs()`, or `lines()`. Useful when you need some content but don't care about the exact shape.
+
+```typescript
+faker.lorem.text()
+// 'Doloribus autem non quis vero quia.'
+
+faker.lorem.text()
+// 'Rerum eum reiciendis id ipsa hic dolore aut laborum provident.
+// Quis beatae quis corporis veritatis corrupti ratione delectus sapiente ut.
+// Quis ut dolor dolores facilis possimus tempore voluptates.
+// Iure nam officia optio cumque.
+// Dolor tempora iusto.'
+```
+
+<Tip>
+Because `text()` delegates to a random method internally, the output length is unpredictable. Use `sentence()`, `paragraph()`, or another specific method when you need consistent sizing.
+</Tip>
+
+---
+
+## lines()
+
+Returns multiple sentences separated by newlines (`'\n'`). Defaults to 1–5 lines.
+
+```typescript
+faker.lorem.lines()
+// 'Rerum quia aliquam pariatur explicabo sint minima eos.
+// Voluptatem repellat consequatur deleniti qui quibusdam harum cumque.
+// Enim eveniet a qui.
+// Consectetur velit eligendi animi nostrum veritatis.'
+
+faker.lorem.lines(2)
+// 'Quod quas nam quis impedit aut consequuntur.
+// Animi dolores aspernatur.'
+
+faker.lorem.lines({ min: 1, max: 3 })
+// 'Error dolorem natus quos eum consequatur necessitatibus.'
+```
+
+### Parameters
+
+<ParamField body="lineCount" type="number | { min: number; max: number }" default="{ min: 1, max: 5 }">
+  The number of lines to generate, or a min/max range.
+</ParamField>
+
+---
+
+## slug()
+
+Returns a URL-friendly hyphen-separated string of lorem ipsum words. Defaults to 3 words.
+
+```typescript
+faker.lorem.slug()                    // 'dolores-illo-est'
+faker.lorem.slug(5)                   // 'delectus-totam-iusto-itaque-placeat'
+faker.lorem.slug({ min: 1, max: 3 }) // 'illo-ratione'
+```
+
+### Parameters
+
+<ParamField body="wordCount" type="number | { min: number; max: number }" default="3">
+  The number of words in the slug, or a min/max range.
+</ParamField>

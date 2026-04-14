@@ -1,0 +1,170 @@
+---
+title: "Custom Randomizers: Swap Faker's Random Number Generator"
+description: "Replace Faker's default Mersenne Twister PRNG with a custom or third-party randomizer to share random state across multiple Faker instances."
+---
+
+Faker's default random number generator is sufficient for the vast majority of use cases. You should only replace it if you have a specific goal — most commonly, sharing a single random state across multiple Faker instances or integrating with a third-party PRNG library.
+
+## The Randomizer interface
+
+A `Randomizer` is any object that satisfies this interface:
+
+```typescript
+export interface Randomizer {
+  next(): number;  // returns a float between 0 (inclusive) and 1 (exclusive)
+  seed(seed: number | number[]): void;
+}
+```
+
+`next()` is called internally by every Faker method that needs a random value. `seed()` is called when you invoke `faker.seed()`, and also when the randomizer is first constructed.
+
+Instances must be seeded and ready for use before being passed to a `Faker` or `SimpleFaker` constructor.
+
+## Built-in randomizers
+
+Faker ships with two Mersenne Twister implementations:
+
+```typescript
+import {
+  generateMersenne32Randomizer, // Default prior to v9
+  generateMersenne53Randomizer, // Default since v9
+} from '@faker-js/faker';
+
+const randomizer = generateMersenne53Randomizer();
+```
+
+| Randomizer | Speed | Quality |
+|---|---|---|
+| `generateMersenne32Randomizer` | Faster | More duplicates |
+| `generateMersenne53Randomizer` | Slightly slower | Significantly fewer duplicates (default since v9) |
+
+Use `generateMersenne32Randomizer` only if raw performance is critical and you can accept more frequent duplicate values.
+
+## Passing a randomizer to a Faker instance
+
+A randomizer is set at construction time and cannot be changed afterwards:
+
+```typescript
+import { Faker, generateMersenne53Randomizer } from '@faker-js/faker';
+
+const randomizer = generateMersenne53Randomizer();
+
+const customFaker = new Faker({
+  locale: en,
+  randomizer,
+});
+```
+
+Both `new Faker(...)` and `new SimpleFaker(...)` accept a `randomizer` option.
+
+## Re-using a randomizer across multiple Faker instances
+
+When you need data in two different locales within the same context, using independent instances creates a reproducibility problem: seeding one instance does not affect the other.
+
+**Without a shared randomizer** — the two instances are independent:
+
+```typescript
+import { fakerEN, fakerZH_TW } from '@faker-js/faker';
+
+fakerZH_TW.seed(5);
+fakerEN.seed(5);
+
+const firstName = fakerZH_TW.person.firstName(); // '炫明'
+const alias = fakerEN.person.firstName();         // 'Arthur'
+```
+
+Seeding each instance separately works, but if the seed is set in a different location than where data is generated (for example, in a test setup hook that runs before a deeply nested factory function), it becomes easy for the two sequences to drift out of sync.
+
+**With a shared randomizer** — one seed controls both:
+
+```typescript
+import { en, Faker, generateMersenne53Randomizer, zh_TW } from '@faker-js/faker';
+
+const randomizer = generateMersenne53Randomizer();
+
+const customFakerEN = new Faker({
+  locale: en,
+  randomizer,
+});
+
+const customFakerZH_TW = new Faker({
+  locale: [zh_TW, en],
+  randomizer,
+});
+
+// Seed the randomizer once — both instances are affected.
+randomizer.seed(5);
+// customFakerEN.seed(5);    // redundant
+// customFakerZH_TW.seed(5); // redundant
+
+const firstName = customFakerZH_TW.person.firstName(); // '炫明'
+const alias = customFakerEN.person.firstName();         // 'John'
+```
+
+<Tip>
+Sharing a randomizer is especially important when seeding happens at a different call site than data generation — for example, when a test framework seeds Faker in `beforeEach` but your factory functions are invoked several levels deeper.
+</Tip>
+
+This pattern also applies when integrating Faker with third-party libraries that accept a custom PRNG. If such a library and Faker share the same `Randomizer`, their outputs are jointly reproducible from a single seed.
+
+## Third-party randomizers
+
+You can implement the `Randomizer` interface against any PRNG library. The following example bridges Faker to [pure-rand](https://github.com/dubzzz/pure-rand):
+
+```typescript
+import { Faker, Randomizer, SimpleFaker } from '@faker-js/faker';
+import { RandomGenerator, xoroshiro128plus } from 'pure-rand';
+
+export function generatePureRandRandomizer(
+  seed: number | number[] = Date.now() ^ (Math.random() * 0x100000000),
+  factory: (seed: number) => RandomGenerator = xoroshiro128plus
+): Randomizer {
+  const self = {
+    next: () => (self.generator.unsafeNext() >>> 0) / 0x100000000,
+    seed: (seed: number | number[]) => {
+      self.generator = factory(typeof seed === 'number' ? seed : seed[0]);
+    },
+  } as Randomizer & { generator: RandomGenerator };
+  self.seed(seed);
+  return self;
+}
+```
+
+Use it with `SimpleFaker` or `Faker`:
+
+```typescript
+const randomizer = generatePureRandRandomizer();
+
+const simpleFaker = new SimpleFaker({ randomizer });
+
+const faker = new Faker({
+  locale: en,
+  randomizer,
+});
+```
+
+<Note>
+Faker does not ship built-in adapters for third-party PRNG libraries and does not provide support for bridging between libraries. The example above is illustrative and is not tested for production correctness.
+</Note>
+
+## Interface reference
+
+```typescript
+export interface Randomizer {
+  /**
+   * Generates a random float between 0 (inclusive) and 1 (exclusive).
+   *
+   * randomizer.next() // 0.3404027920160495
+   * randomizer.next() // 0.929890375900335
+   */
+  next(): number;
+
+  /**
+   * Sets the seed to use.
+   *
+   * randomizer.seed(42);
+   * randomizer.seed([42, 13.37]);
+   */
+  seed(seed: number | number[]): void;
+}
+```

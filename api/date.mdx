@@ -1,0 +1,337 @@
+---
+title: "faker.date — past, future, and relative date generation"
+description: "Generate past, future, recent, and soon dates, birthdates, and between-dates ranges. Supports refDate for reproducible relative dates."
+---
+
+The `faker.date` module generates `Date` objects for a wide variety of scenarios — past or future dates, relative dates within a number of days or years, date ranges, and birthdates. Dates can be specified as JavaScript `Date` objects, ISO strings, or Unix timestamps.
+
+<Note>
+  Methods that accept `refDate` (such as `past()`, `future()`, `recent()`, `soon()`, and `birthdate()`) use `faker.defaultRefDate()` as their reference point. For reproducible results across multiple calls, set a fixed reference date with `faker.setDefaultRefDate('2024-01-01')` before generating dates. Methods `between()` and `betweens()` always require explicit boundaries and are inherently reproducible given the same seed.
+</Note>
+
+## Methods
+
+### past
+
+Generates a random date in the past, relative to a reference date.
+
+<ParamField path="options.years" type="number | { min: number; max: number }">
+  How many years in the past the date may fall. Defaults to `1`.
+</ParamField>
+
+<ParamField path="options.refDate" type="string | Date | number">
+  The reference point for "now". Defaults to `faker.defaultRefDate()`.
+</ParamField>
+
+```javascript
+faker.date.past()
+// '2021-12-03T05:40:44.408Z'
+
+faker.date.past({ years: 10 })
+// '2017-10-25T21:34:19.488Z'
+
+faker.date.past({ years: { min: 4, max: 7 } })
+// '2022-12-12T03:43:16.434Z'
+
+faker.date.past({ years: 10, refDate: '2020-01-01T00:00:00.000Z' })
+// '2017-08-18T02:59:12.350Z'
+```
+
+---
+
+### future
+
+Generates a random date in the future, relative to a reference date.
+
+<ParamField path="options.years" type="number | { min: number; max: number }">
+  How many years in the future the date may fall. Defaults to `1`.
+</ParamField>
+
+<ParamField path="options.refDate" type="string | Date | number">
+  The reference point for "now". Defaults to `faker.defaultRefDate()`.
+</ParamField>
+
+```javascript
+faker.date.future()
+// '2022-11-19T05:52:49.100Z'
+
+faker.date.future({ years: 10 })
+// '2030-11-23T09:38:28.710Z'
+
+faker.date.future({ years: { min: 4, max: 7 } })
+// '2031-05-21T05:49:21.116Z'
+
+faker.date.future({ years: 10, refDate: '2020-01-01T00:00:00.000Z' })
+// '2020-12-13T22:45:10.252Z'
+```
+
+---
+
+### recent
+
+Generates a random date within the last N days relative to a reference date.
+
+<ParamField path="options.days" type="number">
+  Number of days in the past to draw from. Defaults to `1`.
+</ParamField>
+
+<ParamField path="options.refDate" type="string | Date | number">
+  The reference point for "now". Defaults to `faker.defaultRefDate()`.
+</ParamField>
+
+```javascript
+faker.date.recent()
+// '2022-02-04T02:09:35.077Z'
+
+faker.date.recent({ days: 10 })
+// '2022-01-29T06:12:12.829Z'
+
+faker.date.recent({ days: 10, refDate: '2020-01-01T00:00:00.000Z' })
+// '2019-12-27T18:11:19.117Z'
+```
+
+---
+
+### soon
+
+Generates a random date within the next N days relative to a reference date.
+
+<ParamField path="options.days" type="number">
+  Number of days in the future to draw from. Defaults to `1`.
+</ParamField>
+
+<ParamField path="options.refDate" type="string | Date | number">
+  The reference point for "now". Defaults to `faker.defaultRefDate()`.
+</ParamField>
+
+```javascript
+faker.date.soon()
+// '2022-02-05T09:55:39.216Z'
+
+faker.date.soon({ days: 10 })
+// '2022-02-11T05:14:39.138Z'
+
+faker.date.soon({ days: 10, refDate: '2020-01-01T00:00:00.000Z' })
+// '2020-01-01T02:40:44.990Z'
+```
+
+---
+
+### between
+
+Generates a single random date between two explicit boundaries. Both boundaries are required.
+
+<ParamField path="options.from" type="string | Date | number" required>
+  The earliest possible date.
+</ParamField>
+
+<ParamField path="options.to" type="string | Date | number" required>
+  The latest possible date.
+</ParamField>
+
+```javascript
+faker.date.between({
+  from: '2020-01-01T00:00:00.000Z',
+  to: '2030-01-01T00:00:00.000Z',
+})
+// '2026-05-16T02:22:53.002Z'
+```
+
+---
+
+### betweens
+
+Generates multiple random dates between two boundaries. The returned array is sorted in chronological order.
+
+<ParamField path="options.from" type="string | Date | number" required>
+  The earliest possible date.
+</ParamField>
+
+<ParamField path="options.to" type="string | Date | number" required>
+  The latest possible date.
+</ParamField>
+
+<ParamField path="options.count" type="number | { min: number; max: number }">
+  Number of dates to generate. Defaults to `3`.
+</ParamField>
+
+<Tip>
+  To generate a start/end date range, you can use:
+  ```javascript
+  const [start, end] = faker.date.betweens({ from, to, count: 2 });
+  ```
+  Alternatively: `const start = faker.date.soon(); const end = faker.date.soon({ refDate: start });`
+</Tip>
+
+```javascript
+faker.date.betweens({
+  from: '2020-01-01T00:00:00.000Z',
+  to: '2030-01-01T00:00:00.000Z',
+})
+// [
+//   '2022-07-02T06:00:00.000Z',
+//   '2024-12-31T12:00:00.000Z',
+//   '2027-07-02T18:00:00.000Z'
+// ]
+
+faker.date.betweens({
+  from: '2020-01-01T00:00:00.000Z',
+  to: '2030-01-01T00:00:00.000Z',
+  count: 2,
+})
+// [ '2023-05-02T16:00:00.000Z', '2026-09-01T08:00:00.000Z' ]
+
+faker.date.betweens({
+  from: '2020-01-01T00:00:00.000Z',
+  to: '2030-01-01T00:00:00.000Z',
+  count: { min: 2, max: 5 },
+})
+// [
+//   2021-12-19T06:35:40.191Z,
+//   2022-09-10T08:03:51.351Z,
+//   2023-04-19T11:41:17.501Z
+// ]
+```
+
+---
+
+### birthdate
+
+Returns a random birthdate. By default, generates a date for an adult between 18 and 80 years old. Supports two modes: `'age'` range and `'year'` range.
+
+<AccordionGroup>
+  <Accordion title="Default (age 18–80)">
+
+    <ParamField path="options.refDate" type="string | Date | number">
+      Reference point for age calculation. Defaults to `faker.defaultRefDate()`.
+    </ParamField>
+
+    ```javascript
+    faker.date.birthdate()
+    // '1977-07-10T01:37:30.719Z'
+    ```
+
+  </Accordion>
+
+  <Accordion title="Mode: 'age'">
+
+    <ParamField path="options.mode" type="'age'" required>
+      Generate a birthdate based on an age range.
+    </ParamField>
+
+    <ParamField path="options.min" type="number" required>
+      Minimum age.
+    </ParamField>
+
+    <ParamField path="options.max" type="number" required>
+      Maximum age.
+    </ParamField>
+
+    <ParamField path="options.refDate" type="string | Date | number">
+      Reference date for the age calculation. Defaults to `faker.defaultRefDate()`.
+    </ParamField>
+
+    ```javascript
+    faker.date.birthdate({ mode: 'age', min: 18, max: 65 })
+    // '2003-11-02T20:03:20.116Z'
+    ```
+
+  </Accordion>
+
+  <Accordion title="Mode: 'year'">
+
+    <ParamField path="options.mode" type="'year'" required>
+      Generate a birthdate within a specific year range.
+    </ParamField>
+
+    <ParamField path="options.min" type="number" required>
+      Minimum birth year.
+    </ParamField>
+
+    <ParamField path="options.max" type="number" required>
+      Maximum birth year.
+    </ParamField>
+
+    ```javascript
+    faker.date.birthdate({ mode: 'year', min: 1900, max: 2000 })
+    // '1940-08-20T08:53:07.538Z'
+    ```
+
+  </Accordion>
+</AccordionGroup>
+
+---
+
+### month
+
+Returns a random localized month name.
+
+<ParamField path="options.abbreviated" type="boolean">
+  Return an abbreviated month name (e.g., `'Feb'` instead of `'February'`). Defaults to `false`.
+</ParamField>
+
+<ParamField path="options.context" type="boolean">
+  Use the grammatical context form where applicable (affects some locales such as `ru` or `fr`). Defaults to `false`.
+</ParamField>
+
+```javascript
+faker.date.month()
+// 'October'
+
+faker.date.month({ abbreviated: true })
+// 'Feb'
+
+faker.date.month({ abbreviated: true, context: true })
+// 'Sep'
+```
+
+---
+
+### weekday
+
+Returns a random localized day of the week.
+
+<ParamField path="options.abbreviated" type="boolean">
+  Return an abbreviated weekday name (e.g., `'Thu'` instead of `'Thursday'`). Defaults to `false`.
+</ParamField>
+
+<ParamField path="options.context" type="boolean">
+  Use the grammatical context form where applicable (affects some locales such as `fr` or `ru`). Defaults to `false`.
+</ParamField>
+
+```javascript
+faker.date.weekday()
+// 'Monday'
+
+faker.date.weekday({ abbreviated: true })
+// 'Thu'
+
+faker.date.weekday({ abbreviated: true, context: true })
+// 'Fri'
+```
+
+---
+
+### anytime
+
+Generates a random date that may be either in the past or the future, within one year of the reference date.
+
+<ParamField path="options.refDate" type="string | Date | number">
+  The reference point. Defaults to `faker.defaultRefDate()`.
+</ParamField>
+
+```javascript
+faker.date.anytime()
+// '2022-07-31T01:33:29.567Z'
+```
+
+---
+
+### timeZone
+
+Returns a random IANA time zone name (e.g., `'Pacific/Guam'`). Not tied to the current locale.
+
+```javascript
+faker.date.timeZone()
+// 'Pacific/Guam'
+```

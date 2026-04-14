@@ -1,0 +1,381 @@
+---
+title: "faker.finance — accounts, currencies, and crypto"
+description: "Generate bank account numbers, IBANs, BICs, routing numbers, credit card details, currency codes, and Bitcoin/Ethereum addresses with faker.finance."
+---
+
+The `faker.finance` module generates financial data for testing payment systems, banking interfaces, and blockchain applications. It covers traditional bank accounts, credit cards, currencies, and cryptocurrency addresses.
+
+---
+
+## Bank accounts
+
+### accountNumber()
+
+Generates a random numeric account number.
+
+<CodeGroup>
+
+```typescript basic
+faker.finance.accountNumber()           // '92842238'
+```
+
+```typescript with options
+faker.finance.accountNumber(5)          // '32564'
+faker.finance.accountNumber({ length: 5 }) // '32564'
+```
+
+</CodeGroup>
+
+<ParamField body="options.length" type="number" default="8">
+  The number of digits in the account number. Can be passed directly as a number or inside an options object.
+</ParamField>
+
+---
+
+### accountName()
+
+Generates a random account type name.
+
+```typescript
+faker.finance.accountName() // 'Personal Loan Account'
+```
+
+---
+
+### routingNumber()
+
+Generates a valid 9-digit US routing number. The check digit is computed using the ABA Modulo 10 algorithm.
+
+```typescript
+faker.finance.routingNumber() // '522814402'
+```
+
+---
+
+### iban()
+
+Generates a random IBAN. The country-specific format and checksum are correctly computed.
+
+<CodeGroup>
+
+```typescript basic
+faker.finance.iban() // 'TR736918640040966092800056'
+```
+
+```typescript with options
+faker.finance.iban({ formatted: true })
+// 'FR20 8008 2330 8984 74S3 Z620 224'
+
+faker.finance.iban({ formatted: true, countryCode: 'DE' })
+// 'DE84 1022 7075 0900 1170 01'
+```
+
+</CodeGroup>
+
+<ParamField body="options.formatted" type="boolean" default="false">
+  When `true`, inserts a space after every 4 characters for human readability.
+</ParamField>
+
+<ParamField body="options.countryCode" type="string">
+  A two-letter ISO 3166-1 country code (e.g. `'DE'`, `'FR'`). When omitted, a random supported country is used. Throws a `FakerError` if the country code is not supported.
+</ParamField>
+
+<Note>
+The generated IBAN may not pass all bank-specific validation rules. Country format and checksum are valid, but randomly generated bank codes may not correspond to real institutions.
+</Note>
+
+---
+
+### bic()
+
+Generates a random SWIFT/BIC code in [ISO-9362](https://en.wikipedia.org/wiki/ISO_9362) format.
+
+<CodeGroup>
+
+```typescript basic
+faker.finance.bic() // 'WYAUPGX1'
+```
+
+```typescript with options
+faker.finance.bic({ includeBranchCode: true })  // 'KCAUPGR1432'
+faker.finance.bic({ includeBranchCode: false }) // 'XDAFQGT7'
+```
+
+</CodeGroup>
+
+<ParamField body="options.includeBranchCode" type="boolean" default="random boolean">
+  When `true`, appends a 3-character branch code. When `false`, omits it. Defaults to a random boolean.
+</ParamField>
+
+---
+
+### pin()
+
+Generates a random numeric PIN.
+
+<CodeGroup>
+
+```typescript basic
+faker.finance.pin()           // '5067'
+```
+
+```typescript with options
+faker.finance.pin(6)          // '213789'
+faker.finance.pin({ length: 6 }) // '213789'
+```
+
+</CodeGroup>
+
+<ParamField body="options.length" type="number" default="4">
+  The number of digits in the PIN. Can be passed directly as a number or inside an options object. Throws a `FakerError` if less than `1`.
+</ParamField>
+
+---
+
+## Amounts
+
+### amount()
+
+Generates a random monetary amount between `min` and `max`.
+
+<CodeGroup>
+
+```typescript basic
+faker.finance.amount() // '617.87'
+```
+
+```typescript with options
+faker.finance.amount({ min: 5, max: 10 })                              // '5.53'
+faker.finance.amount({ min: 5, max: 10, dec: 0 })                     // '8'
+faker.finance.amount({ min: 5, max: 10, dec: 2, symbol: '$' })        // '$5.85'
+faker.finance.amount({ min: 5, max: 10, dec: 5, autoFormat: true })   // '9,75067'
+```
+
+</CodeGroup>
+
+<ParamField body="options.min" type="number" default="0">
+  The lower bound for the amount.
+</ParamField>
+
+<ParamField body="options.max" type="number" default="1000">
+  The upper bound for the amount.
+</ParamField>
+
+<ParamField body="options.dec" type="number" default="2">
+  The number of decimal places.
+</ParamField>
+
+<ParamField body="options.symbol" type="string" default='""'>
+  A currency symbol prepended to the output (e.g. `'$'`, `'€'`).
+</ParamField>
+
+<ParamField body="options.autoFormat" type="boolean" default="false">
+  When `true`, uses `Number.toLocaleString()` for locale-aware formatting (e.g. commas as decimal separators). When `false`, uses `Number.toFixed()`.
+</ParamField>
+
+---
+
+## Credit cards
+
+### creditCardNumber()
+
+Generates a random credit card number. Optionally specify an issuer by name or provide a custom format string.
+
+<CodeGroup>
+
+```typescript basic
+faker.finance.creditCardNumber() // '4427163488662'
+```
+
+```typescript by issuer
+faker.finance.creditCardNumber('visa')              // '4882664999007'
+faker.finance.creditCardNumber({ issuer: 'visa' })  // '4882664999007'
+```
+
+```typescript custom format
+faker.finance.creditCardNumber('63[7-9]#-####-####-###L')
+// '6375-3265-4676-6646'
+```
+
+</CodeGroup>
+
+<ParamField body="options.issuer" type="string" default='""'>
+  The name of the card issuer (case-insensitive), such as `'visa'`, `'mastercard'`, or `'discover'`. You can also pass a custom format string using `#` for random digits and `L` for a Luhn check digit. Can be passed directly as a string or inside an options object.
+</ParamField>
+
+---
+
+### creditCardCVV()
+
+Generates a random 3-digit credit card CVV.
+
+```typescript
+faker.finance.creditCardCVV() // '506'
+```
+
+---
+
+### creditCardIssuer()
+
+Returns a random credit card issuer name.
+
+```typescript
+faker.finance.creditCardIssuer() // 'discover'
+```
+
+---
+
+## Transactions
+
+### transactionType()
+
+Returns a random transaction type string.
+
+```typescript
+faker.finance.transactionType() // 'payment'
+```
+
+---
+
+### transactionDescription()
+
+Generates a full transaction description sentence including a transaction type, merchant name, card ending, currency, amount, and account number.
+
+```typescript
+faker.finance.transactionDescription()
+// 'payment transaction at Emard LLC using card ending with ****9187 for HNL 506.57 in account ***2584.'
+```
+
+---
+
+## Currencies
+
+### currency()
+
+Returns a random currency object with `code`, `name`, `symbol`, and `numericCode` properties.
+
+```typescript
+faker.finance.currency()
+// { code: 'USD', name: 'US Dollar', symbol: '$', numericCode: '840' }
+```
+
+<AccordionGroup>
+  <Accordion title="Currency object fields">
+
+| Field | Type | Description |
+|---|---|---|
+| `code` | `string` | ISO 4217 alphabetic code, e.g. `'USD'` |
+| `name` | `string` | Full currency name, e.g. `'US Dollar'` |
+| `symbol` | `string` | Currency symbol, e.g. `'$'` |
+| `numericCode` | `string` | ISO 4217 numeric code, e.g. `'840'` |
+
+  </Accordion>
+</AccordionGroup>
+
+---
+
+### currencyCode()
+
+Returns a random ISO 4217 currency code.
+
+```typescript
+faker.finance.currencyCode() // 'USD'
+```
+
+---
+
+### currencyName()
+
+Returns a random currency name.
+
+```typescript
+faker.finance.currencyName() // 'US Dollar'
+```
+
+---
+
+### currencySymbol()
+
+Returns a random non-empty currency symbol.
+
+```typescript
+faker.finance.currencySymbol() // '$'
+```
+
+---
+
+## Cryptocurrency
+
+### bitcoinAddress()
+
+Generates a random Bitcoin address. Supports all four address families across mainnet and testnet.
+
+<CodeGroup>
+
+```typescript basic
+faker.finance.bitcoinAddress() // '1TeZEFLmGPLEQrSRdAcnZLoWwYeiHwmRog'
+```
+
+```typescript by type
+faker.finance.bitcoinAddress({ type: 'bech32' })
+// 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4'
+```
+
+```typescript by type and network
+faker.finance.bitcoinAddress({ type: 'bech32', network: 'testnet' })
+// 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx'
+```
+
+</CodeGroup>
+
+<ParamField body="options.type" type="BitcoinAddressFamilyType" default="random">
+  The Bitcoin address format. Defaults to a random family.
+
+  | Value | Description | Mainnet prefix | Testnet prefix |
+  |---|---|---|---|
+  | `'legacy'` | P2PKH — original address format | `1` | `m` |
+  | `'segwit'` | P2SH — pay-to-script-hash | `3` | `2` |
+  | `'bech32'` | Native SegWit — bech32 encoding | `bc1` | `tb1` |
+  | `'taproot'` | Taproot — bech32m encoding | `bc1p` | `tb1p` |
+</ParamField>
+
+<ParamField body="options.network" type="BitcoinNetworkType" default='"mainnet"'>
+  The Bitcoin network. Valid values are `'mainnet'` and `'testnet'`.
+</ParamField>
+
+<Note>
+The `type` and `network` options accept string literals from the `BitcoinAddressFamily` and `BitcoinNetwork` enums exported from `@faker-js/faker`.
+
+```typescript
+import { BitcoinAddressFamily, BitcoinNetwork } from '@faker-js/faker';
+
+faker.finance.bitcoinAddress({
+  type: BitcoinAddressFamily.Bech32,
+  network: BitcoinNetwork.Testnet,
+});
+```
+</Note>
+
+---
+
+### ethereumAddress()
+
+Generates a random non-checksummed Ethereum address (40 lowercase hex characters with `0x` prefix).
+
+```typescript
+faker.finance.ethereumAddress() // '0xf03dfeecbafc5147241cc4c4ca20b3c9dfd04c4a'
+```
+
+<Tip>
+To produce a checksummed Ethereum address (EIP-55), pass the result through a third-party library such as `viem` or `ethers`.
+</Tip>
+
+---
+
+### litecoinAddress()
+
+Generates a random Litecoin address (26–33 characters, starting with `L`, `M`, or `3`).
+
+```typescript
+faker.finance.litecoinAddress() // 'MoQaSTGWBRXkWfyxKbNKuPrAWGELzcW'
+```

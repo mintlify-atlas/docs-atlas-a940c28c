@@ -1,0 +1,258 @@
+---
+title: "faker.color — RGB, HSL, and human-readable color values"
+description: "Generate colors in RGB, HSL, HWB, LAB, LCH, CMYK, and CSS named formats. Supports CSS function output and multiple color spaces with faker.color."
+---
+
+`faker.color` generates color values in a wide range of formats. For human-readable names like `'red'`, use `human()`. For hex colors used in HTML and CSS, use `rgb()`. For other color models, use the dedicated methods: `hsl()`, `hwb()`, `cmyk()`, `lab()`, `lch()`, or `colorByCSSColorSpace()`.
+
+Most methods support three output formats controlled by the `format` option:
+
+- `'decimal'` — returns a `number[]` array (default for most methods)
+- `'css'` — returns a CSS function string such as `rgb(216, 17, 192)`
+- `'binary'` — returns a space-separated binary string
+- `'hex'` — returns a hex string (only for `rgb()`)
+
+<Note>
+The `CssFunction` and `CssSpace` enums are exported from `'@faker-js/faker'` and can be used for type-safe access to the supported function and space names.
+
+```typescript
+import { CssFunction, CssSpace } from '@faker-js/faker';
+```
+</Note>
+
+## human()
+
+Returns a random human-readable CSS color name such as `'red'` or `'coral'`.
+
+```typescript
+faker.color.human() // 'red'
+```
+
+---
+
+## space()
+
+Returns a random color space name from the worldwide accepted color spaces.
+
+```typescript
+faker.color.space() // 'sRGB'
+```
+
+---
+
+## cssSupportedFunction()
+
+Returns a random CSS color function name.
+
+```typescript
+faker.color.cssSupportedFunction() // 'rgb'
+```
+
+Possible values correspond to the `CssFunction` enum: `'rgb'`, `'rgba'`, `'hsl'`, `'hsla'`, `'hwb'`, `'cmyk'`, `'lab'`, `'lch'`, `'color'`.
+
+---
+
+## cssSupportedSpace()
+
+Returns a random CSS color space name.
+
+```typescript
+faker.color.cssSupportedSpace() // 'display-p3'
+```
+
+Possible values correspond to the `CssSpace` enum: `'sRGB'`, `'display-p3'`, `'rec2020'`, `'a98-rgb'`, `'prophoto-rgb'`.
+
+---
+
+## rgb()
+
+Returns an RGB color. By default returns a lowercase hex string prefixed with `#`.
+
+```typescript
+faker.color.rgb()                                    // '#0d7f26'
+faker.color.rgb({ prefix: '0x' })                   // '0x9ddc8b'
+faker.color.rgb({ casing: 'upper' })                 // '#B8A51E'
+faker.color.rgb({ format: 'css' })                   // 'rgb(216, 17, 192)'
+faker.color.rgb({ format: 'binary' })                // '00110010 00001000 01110110'
+faker.color.rgb({ format: 'decimal' })               // [64, 192, 174]
+faker.color.rgb({ includeAlpha: true })              // '#f96efb5e'
+faker.color.rgb({ format: 'css', includeAlpha: true }) // 'rgba(180, 158, 24, 0.75)'
+faker.color.rgb({ format: 'decimal', includeAlpha: true }) // [52, 250, 209, 0.21]
+```
+
+### Parameters
+
+<ParamField body="options" type="object">
+  Options for the RGB color.
+</ParamField>
+
+<ParamField body="options.prefix" type="string" default="'#'">
+  Prefix for the hex string. Only applied when `format` is `'hex'`.
+</ParamField>
+
+<ParamField body="options.casing" type="'lower' | 'upper' | 'mixed'" default="'lower'">
+  Letter case for the hex digits. Only applied when `format` is `'hex'`.
+</ParamField>
+
+<ParamField body="options.format" type="'hex' | 'css' | 'binary' | 'decimal'" default="'hex'">
+  Output format. Use `'decimal'` to receive a `number[]` instead of a string.
+</ParamField>
+
+<ParamField body="options.includeAlpha" type="boolean" default="false">
+  When `true`, adds an alpha channel. Produces an 8-digit hex, a `rgba()` CSS string, or a 4-element decimal array.
+</ParamField>
+
+---
+
+## hsl()
+
+Returns an HSL color. Default format is `'decimal'`, returning `[hue, saturation, lightness]`.
+
+```typescript
+faker.color.hsl()                                        // [201, 0.23, 0.32]
+faker.color.hsl({ format: 'decimal' })                   // [300, 0.21, 0.52]
+faker.color.hsl({ format: 'css' })                       // 'hsl(0deg, 100%, 80%)'
+faker.color.hsl({ format: 'css', includeAlpha: true })   // 'hsl(0deg 100% 50% / 0.5)'
+faker.color.hsl({ format: 'decimal', includeAlpha: true }) // [300, 0.21, 0.52, 0.28]
+faker.color.hsl({ format: 'binary' })                    // (8-32 bits) x 3
+```
+
+### Parameters
+
+<ParamField body="options" type="object">
+  Options for the HSL color.
+</ParamField>
+
+<ParamField body="options.format" type="'css' | 'binary' | 'decimal'" default="'decimal'">
+  Output format.
+</ParamField>
+
+<ParamField body="options.includeAlpha" type="boolean" default="false">
+  When `true`, adds an alpha channel.
+</ParamField>
+
+---
+
+## hwb()
+
+Returns an HWB color. Default format is `'decimal'`, returning `[hue, whiteness, blackness]`.
+
+```typescript
+faker.color.hwb()                      // [201, 0.21, 0.31]
+faker.color.hwb({ format: 'decimal' }) // [201, 0.21, 0.31]
+faker.color.hwb({ format: 'css' })     // 'hwb(354 72% 41%)'
+faker.color.hwb({ format: 'binary' })  // (8-32 bits x 3)
+```
+
+### Parameters
+
+<ParamField body="options" type="object">
+  Options for the HWB color.
+</ParamField>
+
+<ParamField body="options.format" type="'css' | 'binary' | 'decimal'" default="'decimal'">
+  Output format.
+</ParamField>
+
+---
+
+## lab()
+
+Returns a CIELAB (LAB) color. Default format is `'decimal'`, returning `[lightness, a, b]` where `a` and `b` range from `-100` to `100`.
+
+```typescript
+faker.color.lab()                      // [0.832133, -80.3245, 100.1234]
+faker.color.lab({ format: 'decimal' }) // [0.856773, -80.2345, 100.2341]
+faker.color.lab({ format: 'css' })     // 'lab(29.2345% 39.3825 20.0664)'
+faker.color.lab({ format: 'binary' })  // (8-32 bits x 3)
+```
+
+### Parameters
+
+<ParamField body="options" type="object">
+  Options for the LAB color.
+</ParamField>
+
+<ParamField body="options.format" type="'css' | 'binary' | 'decimal'" default="'decimal'">
+  Output format.
+</ParamField>
+
+---
+
+## lch()
+
+Returns an LCH color. Default format is `'decimal'`, returning `[lightness, chroma, hue]`. Chroma is bounded to `230` in practice.
+
+```typescript
+faker.color.lch()                      // [0.522345, 72.2, 56.2]
+faker.color.lch({ format: 'decimal' }) // [0.522345, 72.2, 56.2]
+faker.color.lch({ format: 'css' })     // 'lch(52.2345% 72.2 56.2)'
+faker.color.lch({ format: 'binary' })  // (8-32 bits x 3)
+```
+
+### Parameters
+
+<ParamField body="options" type="object">
+  Options for the LCH color.
+</ParamField>
+
+<ParamField body="options.format" type="'css' | 'binary' | 'decimal'" default="'decimal'">
+  Output format.
+</ParamField>
+
+---
+
+## cmyk()
+
+Returns a CMYK color. Default format is `'decimal'`, returning `[cyan, magenta, yellow, key]` as floats between `0` and `1`.
+
+```typescript
+faker.color.cmyk()                      // [0.31, 0.52, 0.32, 0.43]
+faker.color.cmyk({ format: 'decimal' }) // [0.31, 0.52, 0.32, 0.43]
+faker.color.cmyk({ format: 'css' })     // 'cmyk(35%, 39%, 68%, 60%)'
+faker.color.cmyk({ format: 'binary' })  // (8-32 bits) x 4
+```
+
+### Parameters
+
+<ParamField body="options" type="object">
+  Options for the CMYK color.
+</ParamField>
+
+<ParamField body="options.format" type="'css' | 'binary' | 'decimal'" default="'decimal'">
+  Output format.
+</ParamField>
+
+---
+
+## colorByCSSColorSpace()
+
+Returns a random color expressed in a CSS color space. Default format is `'decimal'`, returning `[r, g, b]` as floats between `0` and `1`.
+
+```typescript
+faker.color.colorByCSSColorSpace()
+// [0.93, 1, 0.82]
+
+faker.color.colorByCSSColorSpace({ format: 'decimal' })
+// [0.12, 0.21, 0.31]
+
+faker.color.colorByCSSColorSpace({ format: 'css', space: 'display-p3' })
+// 'color(display-p3 0.12 1 0.23)'
+
+faker.color.colorByCSSColorSpace({ format: 'binary' })
+// (8-32 bits x 3)
+```
+
+### Parameters
+
+<ParamField body="options" type="object">
+  Options for the CSS color space color.
+</ParamField>
+
+<ParamField body="options.format" type="'css' | 'binary' | 'decimal'" default="'decimal'">
+  Output format.
+</ParamField>
+
+<ParamField body="options.space" type="CssSpaceType" default="'sRGB'">
+  The CSS color space to use. Accepts any value from the `CssSpace` enum: `'sRGB'`, `'display-p3'`, `'rec2020'`, `'a98-rgb'`, `'prophoto-rgb'`.
+</ParamField>

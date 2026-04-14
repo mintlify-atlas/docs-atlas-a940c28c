@@ -1,0 +1,59 @@
+---
+title: "Faker: Generate Realistic Fake Data for JS/TS"
+description: "Faker is a TypeScript/JavaScript library for generating realistic fake data for testing and development. Supports 70+ locales and 27 modules."
+---
+
+Faker is a TypeScript/JavaScript library for generating massive amounts of realistic fake data — names, addresses, emails, dates, finance records, and much more. This documentation covers the JavaScript/TypeScript implementation of Faker (`@faker-js/faker`), including installation, usage patterns, locale configuration, and the full API reference.
+
+## Key features
+
+<CardGroup cols={3}>
+  <Card title="27 data modules" icon="cubes">
+    People, locations, internet, dates, finance, commerce, hacker, and many more — all in one package.
+  </Card>
+  <Card title="70+ locales" icon="language">
+    Import locale-specific instances like `fakerDE` or `fakerJA` to generate region-appropriate data.
+  </Card>
+  <Card title="TypeScript first" icon="brackets-curly">
+    Full type definitions included. Works with strict mode and all modern module resolution strategies.
+  </Card>
+  <Card title="Reproducible seeding" icon="rotate">
+    Seed the pseudorandom number generator to produce consistent values — ideal for snapshot and regression tests.
+  </Card>
+  <Card title="Tree-shakeable" icon="leaf">
+    Import only the locale data you need to keep browser bundle sizes small.
+  </Card>
+  <Card title="Node and browser" icon="browser">
+    Runs in Node.js v20+ and modern browsers. Also available via CDN and Deno.
+  </Card>
+</CardGroup>
+
+## API modules
+
+Faker organises its data generators into 27 focused modules. The most commonly used are listed below.
+
+<CardGroup cols={2}>
+  <Card title="Faker (main instance)" icon="bolt" href="/api/faker">
+    The top-level `faker` object that provides access to all modules and global configuration such as `seed()` and `setDefaultRefDate()`.
+  </Card>
+  <Card title="person" icon="person" href="/api/person">
+    Full names, first names, last names, prefixes, suffixes, job titles, sex types, and bio lines.
+  </Card>
+  <Card title="internet" icon="globe" href="/api/internet">
+    Emails, usernames, passwords, URLs, IP addresses, MAC addresses, and HTTP methods.
+  </Card>
+  <Card title="date" icon="calendar" href="/api/date">
+    Past, future, recent, soon, between, and birthdate generators with optional reference date support.
+  </Card>
+  <Card title="helpers" icon="wrench" href="/api/helpers">
+    Utility methods including `arrayElement`, `multiple`, `fake` (mustache templating), `shuffle`, and `unique`.
+  </Card>
+</CardGroup>
+
+## Community
+
+If you have questions or need help, reach out via [Discord](https://chat.fakerjs.dev) or [GitHub Discussions](https://github.com/faker-js/faker/discussions). You can also find community projects and integrations at [Awesome Faker](https://github.com/faker-js/awesome-faker).
+
+<Note>
+  Faker is a large package — over 5 MiB minified — because of the locale string data it ships. It is well-suited as a development or test dependency, but you should avoid bundling the full package into a production web application. If you only need locale-neutral data (UUIDs, numbers, strings), consider importing `simpleFaker` instead, which carries no locale data.
+</Note>

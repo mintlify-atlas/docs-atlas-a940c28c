@@ -1,0 +1,189 @@
+---
+title: "SimpleFaker: locale-independent data generation"
+description: "Reference for SimpleFaker and the simpleFaker instance. Generates UUIDs, numbers, dates, and strings without loading any locale data."
+---
+
+`SimpleFaker` generates data that requires no locale — numbers, strings, UUIDs, and basic dates. Use it when you want to avoid loading 500KB+ of locale data and only need primitive types.
+
+## Quick usage
+
+<CodeGroup>
+
+```typescript ESM
+import { simpleFaker } from '@faker-js/faker';
+
+simpleFaker.string.uuid(); // 'c50e1f5c-86e8-4aa9-888e-168e0a182519'
+simpleFaker.number.int(10); // 4
+```
+
+```javascript CJS
+const { simpleFaker } = require('@faker-js/faker');
+
+simpleFaker.string.uuid(); // 'c50e1f5c-86e8-4aa9-888e-168e0a182519'
+simpleFaker.number.int(10); // 4
+```
+
+</CodeGroup>
+
+<Note>
+`SimpleFaker` is the base class that `Faker` extends. All six modules listed below are also available on any full `Faker` instance.
+</Note>
+
+## Available modules
+
+`SimpleFaker` exposes six modules, all of which operate without any locale data.
+
+| Module | Description | Excluded methods |
+|---|---|---|
+| `datatype` | Primitive boolean values | — |
+| `date` | Dates in the past, future, and between ranges | `month()`, `weekday()` (locale-dependent) |
+| `helpers` | Array, object, and enumeration utilities | `fake()` (requires locale) |
+| `location` | Geographic coordinates | All address/city/country methods |
+| `number` | Integers, floats, hex values, and big integers | — |
+| `string` | UUIDs, alphanumeric strings, nanoids, and binary strings | — |
+
+### datatype
+
+Generates boolean values with optional probability weighting.
+
+```typescript
+simpleFaker.datatype.boolean();                   // true
+simpleFaker.datatype.boolean({ probability: 0.3 }); // false (30% chance of true)
+```
+
+### date
+
+Generates date objects. `month()` and `weekday()` are excluded because they require locale data for localized names.
+
+```typescript
+simpleFaker.date.past();                         // Date in the past
+simpleFaker.date.future();                       // Date in the future
+simpleFaker.date.between({ from: '2020-01-01', to: '2030-12-31' }); // Date in range
+simpleFaker.date.recent();                       // Date within the last day
+```
+
+### helpers
+
+Utility methods for working with arrays, objects, and enumerations. `fake()` is excluded because it parses mustache-style templates that reference locale-specific modules.
+
+```typescript
+simpleFaker.helpers.arrayElement(['red', 'green', 'blue']); // 'green'
+simpleFaker.helpers.shuffle([1, 2, 3, 4, 5]);               // [3, 1, 5, 2, 4]
+simpleFaker.helpers.multiple(() => simpleFaker.number.int(10), { count: 3 }); // [4, 7, 2]
+simpleFaker.helpers.objectKey({ a: 1, b: 2, c: 3 });        // 'b'
+```
+
+### location
+
+Only the three coordinate methods are included. Street addresses, city names, and country names all require locale data.
+
+```typescript
+simpleFaker.location.latitude();               // 37.7749
+simpleFaker.location.longitude();              // -122.4194
+simpleFaker.location.nearbyGPSCoordinate({ origin: [37.7749, -122.4194] });
+// [37.8043, -122.3892]
+```
+
+### number
+
+Generates numeric values of any type.
+
+```typescript
+simpleFaker.number.int(100);                          // 42
+simpleFaker.number.int({ min: 1, max: 6 });           // 4
+simpleFaker.number.float({ min: 0, max: 1, fractionDigits: 2 }); // 0.73
+simpleFaker.number.hex(255);                          // 'ff'
+simpleFaker.number.bigInt(1000n);                     // 521n
+```
+
+### string
+
+Generates string values including UUIDs, alphanumeric strings, and encoded formats.
+
+```typescript
+simpleFaker.string.uuid();                 // 'c50e1f5c-86e8-4aa9-888e-168e0a182519'
+simpleFaker.string.alphanumeric(10);       // 'a4b2c8d1e5'
+simpleFaker.string.nanoid();               // 'V1StGXR8_Z5jdHi6B-myT'
+simpleFaker.string.binary({ length: 8 });  // '01001011'
+simpleFaker.string.hexadecimal({ length: 6 }); // '0xF3A2B1'
+```
+
+## Constructor
+
+Use the constructor when you need a custom randomizer or a fixed initial seed. For most cases the pre-built `simpleFaker` export is sufficient.
+
+```typescript
+import { SimpleFaker } from '@faker-js/faker';
+
+const customSimpleFaker = new SimpleFaker({ seed: 42 });
+customSimpleFaker.number.int(10); // always 4 for seed 42
+```
+
+### Options
+
+<ParamField body="randomizer" type="Randomizer">
+  A custom randomizer to use instead of Faker's default Mersenne Twister (53-bit). Use this when you want to share a random generator with another library or tool.
+</ParamField>
+
+<ParamField body="seed" type="number">
+  An initial seed for reproducible output. Equivalent to calling `simpleFaker.seed(n)` immediately after construction.
+</ParamField>
+
+## Methods
+
+### seed()
+
+Sets the seed for the random number generator to produce reproducible output. Generated values depend on both the seed and the number of calls made since it was set.
+
+```typescript
+simpleFaker.seed(42);
+simpleFaker.number.int(10); // 4
+simpleFaker.number.int(10); // 10
+
+simpleFaker.seed(42);
+simpleFaker.number.int(10); // 4  ← same as before
+simpleFaker.number.int(10); // 10 ← same as before
+```
+
+Call `seed()` with no argument to generate a random seed and return its value — useful for logging and reproducing failing tests:
+
+```typescript
+const seed = simpleFaker.seed();
+console.log('seed:', seed); // seed: 3487219384
+```
+
+<ParamField body="seed" type="number | number[]">
+  The seed value. Pass a single number or an array of numbers. Omit to generate a random seed. Returns the seed that was set.
+</ParamField>
+
+### setDefaultRefDate()
+
+Sets the reference date used as "now" when generating relative dates such as `simpleFaker.date.past()`. Defaults to `() => new Date()` evaluated at call time.
+
+Use this together with `seed()` for fully reproducible date generation:
+
+```typescript
+simpleFaker.seed(1234);
+simpleFaker.setDefaultRefDate(new Date('2020-01-01'));
+
+simpleFaker.date.past(); // always the same date for this seed + refDate
+```
+
+<ParamField body="dateOrSource" type="string | Date | number | (() => Date)" default="() => new Date()">
+  A static value (date string, `Date` object, or Unix timestamp in milliseconds) or a function that returns a fresh `Date` on each call. Omit to restore the default behavior.
+</ParamField>
+
+## SimpleFaker vs Faker
+
+<Note>
+Use `SimpleFaker` when you only need UUIDs, numbers, booleans, or strings and want the smallest possible bundle. Use the full `Faker` class when you need locale-aware data such as names, addresses, or product names.
+</Note>
+
+| | `SimpleFaker` | `Faker` |
+|---|---|---|
+| Locale data required | No | Yes |
+| Bundle size impact | Minimal | ~500KB+ depending on locale |
+| Modules available | 6 | 27 |
+| `getMetadata()` | No | Yes |
+| `helpers.fake()` | No | Yes |
+| Locale-specific names, addresses, text | No | Yes |

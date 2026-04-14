@@ -1,0 +1,293 @@
+---
+title: "faker.person — names, job titles, and demographics"
+description: "Generate realistic personal data including names, prefixes, suffixes, job titles, sex, and biographical information with faker.person."
+---
+
+The `faker.person` module generates realistic personal data — first names, last names, full names, honorifics, job titles, and more. Many methods accept an optional `sex` parameter to control whether female, male, or mixed-sex data is returned. Output is locale-aware, so locale-specific name patterns are applied automatically.
+
+<Note>
+Prior to Faker 8.0.0, this module was called `faker.name`. Update any existing references to `faker.person`.
+</Note>
+
+## Names
+
+### firstName
+
+Returns a random first name.
+
+<ParamField query="sex" type="'female' | 'male'">
+  Constrains the result to names typically associated with the given sex. If omitted, a random sex is chosen.
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.person.firstName()           // 'Antwan'
+faker.person.firstName('female')   // 'Victoria'
+faker.person.firstName('male')     // 'Tom'
+```
+
+---
+
+### lastName
+
+Returns a random last name.
+
+<ParamField query="sex" type="'female' | 'male'">
+  Constrains the result to last names typically associated with the given sex. If omitted, a random sex is chosen.
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.person.lastName()            // 'Hauck'
+faker.person.lastName('female')    // 'Grady'
+faker.person.lastName('male')      // 'Barton'
+```
+
+---
+
+### middleName
+
+Returns a random middle name.
+
+<ParamField query="sex" type="'female' | 'male'">
+  Constrains the result to middle names typically associated with the given sex. If omitted, a random sex is chosen.
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.person.middleName()          // 'James'
+faker.person.middleName('female')  // 'Eloise'
+faker.person.middleName('male')    // 'Asher'
+```
+
+---
+
+### fullName
+
+Generates a random full name. The result may include a prefix, suffix, or both, and the name order is locale-specific.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="firstName" type="string">
+      The first name to use. Defaults to `faker.person.firstName(sex)`.
+    </ParamField>
+    <ParamField body="lastName" type="string">
+      The last name to use. Defaults to `faker.person.lastName(sex)`.
+    </ParamField>
+    <ParamField body="sex" type="'female' | 'male'">
+      Controls which sex-specific name pool to draw from. Defaults to a random choice between `'female'` and `'male'`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.person.fullName()                                          // 'Allen Brown'
+faker.person.fullName({ firstName: 'Joann' })                   // 'Joann Osinski'
+faker.person.fullName({ firstName: 'Marcella', sex: 'female' }) // 'Mrs. Marcella Huels'
+faker.person.fullName({ lastName: 'Beer' })                     // 'Mr. Alfonso Beer'
+faker.person.fullName({ sex: 'male' })                          // 'Fernando Schaefer'
+```
+
+---
+
+### prefix
+
+Returns a random name prefix (honorific).
+
+<ParamField query="sex" type="'female' | 'male'">
+  Constrains the prefix to those associated with the given sex. If omitted, any prefix may be returned.
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.person.prefix()            // 'Miss'
+faker.person.prefix('female')    // 'Ms.'
+faker.person.prefix('male')      // 'Mr.'
+```
+
+---
+
+### suffix
+
+Returns a random name suffix.
+
+**Returns:** `string`
+
+```typescript
+faker.person.suffix()  // 'DDS'
+```
+
+---
+
+## Sex
+
+### sex
+
+Returns a localized string representing a binary sex value. This output is intended for display in forms and profiles, not for use as a parameter in other `faker.person` methods.
+
+**Returns:** `string`
+
+```typescript
+faker.person.sex()  // 'female'
+```
+
+<Note>
+Use `faker.person.sexType()` when you need a value to pass as the `sex` parameter to methods like `firstName()`.
+</Note>
+
+---
+
+### sexType
+
+Returns a `SexType` value (`'female'` or `'male'`), suitable for use as a parameter in other `faker.person` methods.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="includeGeneric" type="boolean" default="false">
+      When `true`, `'generic'` is included in the possible outputs alongside `'female'` and `'male'`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `'female' | 'male' | 'generic'`
+
+```typescript
+faker.person.sexType()                          // 'female'
+faker.person.sexType({ includeGeneric: true })  // 'generic'
+```
+
+---
+
+## Job data
+
+### jobTitle
+
+Generates a random job title composed of a descriptor, area, and type.
+
+**Returns:** `string`
+
+```typescript
+faker.person.jobTitle()  // 'Global Accounts Engineer'
+```
+
+---
+
+### jobDescriptor
+
+Generates a random job descriptor word.
+
+**Returns:** `string`
+
+```typescript
+faker.person.jobDescriptor()  // 'Customer'
+```
+
+---
+
+### jobArea
+
+Generates a random job area.
+
+**Returns:** `string`
+
+```typescript
+faker.person.jobArea()  // 'Brand'
+```
+
+---
+
+### jobType
+
+Generates a random job type.
+
+**Returns:** `string`
+
+```typescript
+faker.person.jobType()  // 'Assistant'
+```
+
+---
+
+## Profile data
+
+### bio
+
+Returns a random short biography suitable for a social profile.
+
+**Returns:** `string`
+
+```typescript
+faker.person.bio()  // 'oatmeal advocate, veteran 🐠'
+```
+
+---
+
+### zodiacSign
+
+Returns a random western zodiac sign.
+
+**Returns:** `string`
+
+```typescript
+faker.person.zodiacSign()  // 'Pisces'
+```
+
+---
+
+## Examples
+
+<AccordionGroup>
+  <Accordion title="Generate a user profile">
+    ```typescript
+    import { faker } from '@faker-js/faker';
+
+    const user = {
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      fullName: faker.person.fullName(),
+      jobTitle: faker.person.jobTitle(),
+      bio: faker.person.bio(),
+    };
+
+    // {
+    //   firstName: 'Victoria',
+    //   lastName: 'Grady',
+    //   fullName: 'Ms. Victoria Grady',
+    //   jobTitle: 'Global Accounts Engineer',
+    //   bio: 'oatmeal advocate, veteran 🐠'
+    // }
+    ```
+  </Accordion>
+
+  <Accordion title="Generate sex-specific names">
+    ```typescript
+    import { faker } from '@faker-js/faker';
+
+    const sex = faker.person.sexType();
+
+    const profile = {
+      sex,
+      prefix: faker.person.prefix(sex),
+      firstName: faker.person.firstName(sex),
+      middleName: faker.person.middleName(sex),
+      lastName: faker.person.lastName(sex),
+      suffix: faker.person.suffix(),
+    };
+    ```
+  </Accordion>
+
+  <Accordion title="Use locale-specific names">
+    ```typescript
+    import { fakerDE, fakerJA } from '@faker-js/faker';
+
+    fakerDE.person.fullName()  // 'Herr Klaus Müller'
+    fakerJA.person.fullName()  // '山田 太郎'
+    ```
+  </Accordion>
+</AccordionGroup>

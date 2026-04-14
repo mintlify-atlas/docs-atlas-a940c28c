@@ -1,0 +1,275 @@
+---
+title: "Using Faker: Modules, Helpers, and Factory Functions"
+description: "Learn how to generate fake data with Faker's 27 modules, create complex factory functions, and use the helpers module for arrays and utilities."
+---
+
+Faker organizes its data generation into modules grouped by topic. You import a single `faker` instance and call methods on whichever module you need — no configuration required to get started.
+
+## Installation and basic imports
+
+<CodeGroup>
+
+```typescript esm
+import { faker } from '@faker-js/faker';
+// or, if desiring a different locale
+// import { fakerDE as faker } from '@faker-js/faker';
+
+const randomName = faker.person.fullName(); // Rowan Nikolaus
+const randomEmail = faker.internet.email(); // Kassandra.Haley@erich.biz
+```
+
+```javascript cjs
+const { faker } = require('@faker-js/faker');
+// or, if desiring a different locale
+// const { fakerDE: faker } = require('@faker-js/faker');
+
+const randomName = faker.person.fullName(); // Rowan Nikolaus
+const randomEmail = faker.internet.email(); // Kassandra.Haley@erich.biz
+```
+
+</CodeGroup>
+
+For more information on selecting and customizing a locale, see the [Localization guide](/guides/localization).
+
+## Module types
+
+Faker's 27 modules fall into three broad categories.
+
+### Basic datatypes
+
+These modules generate primitive values that are not tied to any real-world topic:
+
+- `faker.datatype` — booleans and other primitives
+- `faker.date` — dates and times
+- `faker.number` — integers and floats
+- `faker.string` — strings, UUIDs, alphanumeric sequences
+
+### Topic modules
+
+These modules generate realistic, locale-aware data for a specific domain:
+
+`airline`, `animal`, `book`, `color`, `commerce`, `company`, `database`, `finance`, `food`, `git`, `hacker`, `image`, `internet`, `location`, `lorem`, `music`, `person`, `phone`, `science`, `system`, `vehicle`, `word`
+
+### Helpers
+
+`faker.helpers` provides utilities for working with data Faker has already generated — picking random elements, shuffling arrays, generating values from templates, and more.
+
+```typescript
+faker.helpers.arrayElement(['free', 'basic', 'business']); // 'basic'
+faker.helpers.shuffle([1, 2, 3, 4, 5]); // [3, 1, 5, 2, 4]
+faker.helpers.multiple(() => faker.person.firstName(), { count: 3 }); // ['Alice', 'Bob', 'Carol']
+```
+
+#### faker.helpers.fake()
+
+`faker.helpers.fake()` lets you build strings from mustache-style templates, calling Faker methods by name:
+
+```typescript
+faker.helpers.fake('Hello {{person.firstName}} {{person.lastName}}!');
+// 'Hello Jane Doe!'
+
+faker.helpers.fake('{{internet.email}} was registered on {{date.past}}');
+// 'alice@example.com was registered on Mon Jan 01 2024 ...'
+```
+
+## Creating complex objects
+
+Faker generates primitive values. For complex objects, write a factory function that composes multiple calls.
+
+### Basic factory function
+
+```typescript
+import { faker } from '@faker-js/faker';
+import type { SexType } from '@faker-js/faker';
+
+type SubscriptionTier = 'free' | 'basic' | 'business';
+
+interface User {
+  _id: string;
+  avatar: string;
+  birthday: Date;
+  email: string;
+  firstName: string;
+  lastName: string;
+  sex: SexType;
+  subscriptionTier: SubscriptionTier;
+}
+
+function createRandomUser(): User {
+  return {
+    _id: faker.string.uuid(),
+    avatar: faker.image.avatar(),
+    birthday: faker.date.birthdate(),
+    email: faker.internet.email(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
+    sex: faker.person.sexType(),
+    subscriptionTier: faker.helpers.arrayElement(['free', 'basic', 'business']),
+  };
+}
+
+const user = createRandomUser();
+```
+
+### Sex-consistent names and email
+
+The basic version above can produce combinations like `sex: 'female'` with `firstName: 'Bob'`. By generating `sex` first and threading it through dependent fields, the output stays internally consistent:
+
+```typescript
+import { faker } from '@faker-js/faker';
+
+function createRandomUser(): User {
+  const sex = faker.person.sexType();
+  const firstName = faker.person.firstName(sex);
+  const lastName = faker.person.lastName();
+  const email = faker.internet.email({ firstName, lastName });
+
+  return {
+    _id: faker.string.uuid(),
+    avatar: faker.image.avatar(),
+    birthday: faker.date.birthdate(),
+    email,
+    firstName,
+    lastName,
+    sex,
+    subscriptionTier: faker.helpers.arrayElement(['free', 'basic', 'business']),
+  };
+}
+```
+
+### Factory functions with overwrites
+
+Accept a `Partial<User>` parameter so callers can pin specific fields while letting Faker fill in the rest:
+
+```typescript
+import { faker } from '@faker-js/faker';
+
+function createRandomUser(overwrites: Partial<User> = {}): User {
+  const {
+    _id = faker.string.uuid(),
+    avatar = faker.image.avatar(),
+    birthday = faker.date.birthdate(),
+    sex = faker.person.sexType(),
+    firstName = faker.person.firstName(sex),
+    lastName = faker.person.lastName(),
+    email = faker.internet.email({ firstName, lastName }),
+    subscriptionTier = faker.helpers.arrayElement([
+      'free',
+      'basic',
+      'business',
+    ]),
+  } = overwrites;
+
+  return {
+    _id,
+    avatar,
+    birthday,
+    email,
+    firstName,
+    lastName,
+    sex,
+    subscriptionTier,
+  };
+}
+
+const user = createRandomUser();
+const userToReject = createRandomUser({ birthday: new Date('2124-10-20') });
+```
+
+<Tip>
+An `options` parameter (separate from `overwrites`) is useful for controlling whether optional properties are included, how nested arrays are merged or replaced, or how many items to generate for nested lists.
+</Tip>
+
+## simpleFaker for locale-independent data
+
+`simpleFaker` is a lightweight instance that skips locale data entirely. Use it when you only need locale-independent output — for example, UUIDs in a test environment — and want to avoid loading the full locale bundle (which adds at least 500 KB).
+
+```typescript
+import { simpleFaker } from '@faker-js/faker';
+
+const uuid = simpleFaker.string.uuid();
+// 'c50e1f5c-86e8-4aa9-888e-168e0a182519'
+
+simpleFaker.number.int(10); // 4
+simpleFaker.helpers.arrayElement(['red', 'green', 'blue']); // 'green'
+```
+
+`simpleFaker` includes: `datatype`, `date` (without `month`/`weekday`), `helpers` (without `fake`), `location` (coordinates only), `number`, and `string`.
+
+## Browser usage
+
+You can load Faker directly in a browser for experimentation:
+
+```javascript browser console
+const { faker } = await import('https://esm.sh/@faker-js/faker');
+
+const randomName = faker.person.fullName(); // Amber Keebler
+const randomEmail = faker.internet.email(); // Norma13@hotmail.com
+```
+
+Or embed it in an HTML file:
+
+```html html file
+<script type="module">
+  import { faker } from 'https://esm.sh/@faker-js/faker';
+
+  const randomName = faker.person.fullName();  // Caitlyn Kerluke
+  const randomEmail = faker.internet.email();  // Rusty@arne.info
+
+  document.getElementById('name').value = randomName;
+  document.getElementById('email').value = randomEmail;
+</script>
+
+<input id="name" />
+<input id="email" />
+```
+
+<Warning>
+Faker is a large package — over 5 MiB minified. It is fine for development and experimentation, but avoid bundling the full Faker package into a production web app.
+</Warning>
+
+## CDN and Deno
+
+```typescript
+import { faker } from 'https://esm.sh/@faker-js/faker';
+
+const randomName = faker.person.fullName(); // Willie Bahringer
+const randomEmail = faker.internet.email(); // Tomasa_Ferry14@hotmail.com
+```
+
+<Note>
+When importing libraries in Deno, use version tags to ensure reproducible installs: `import { faker } from "https://esm.sh/@faker-js/faker@v10.4.0"`.
+</Note>
+
+Alternative CDN links:
+
+- **ESM:** `https://cdn.jsdelivr.net/npm/@faker-js/faker/+esm`
+- **CJS:** `https://cdn.jsdelivr.net/npm/@faker-js/faker`
+
+## TypeScript configuration
+
+Faker is authored in TypeScript and ships full type definitions. For the best experience, ensure your `tsconfig.json` includes a compatible `moduleResolution`:
+
+<CodeGroup>
+
+```json esm (tsconfig.json)
+{
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "strict": true
+  }
+}
+```
+
+```json cjs (tsconfig.json)
+{
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "strict": true
+  }
+}
+```
+
+</CodeGroup>
+
+Accepted values for `moduleResolution`: `"Bundler"`, `"Node10"`, `"Node16"`, `"Node20"`, `"NodeNext"`. The `strict` flag is optional but recommended.

@@ -1,0 +1,113 @@
+---
+title: "faker.food — dishes, ingredients, and descriptions"
+description: "Generate dish names, ethnic food categories, ingredients, spices, meat, fruit, vegetable, and food description strings for culinary app testing with faker.food."
+---
+
+The `faker.food` module generates food-related content suitable for menus, recipe apps, and restaurant listings. You can generate full dish names, long prose descriptions, individual ingredients, spices, vegetables, fruits, meats, and ethnic cuisine categories.
+
+<Note>
+`dish()` and `description()` are generated independently — they will not necessarily correspond to each other.
+</Note>
+
+## dish()
+
+Returns a random dish name. The result is a mix of specific dish names and procedurally assembled dish patterns.
+
+```typescript
+faker.food.dish()
+// 'Tagine-Rubbed Venison Salad'
+```
+
+## description()
+
+Returns a long, descriptive sentence suitable for a menu item description.
+
+```typescript
+faker.food.description()
+// 'An exquisite ostrich roast, infused with the essence of longan, slow-roasted to bring out its natural flavors and served with a side of creamy red cabbage'
+```
+
+## ethnicCategory()
+
+Returns a random ethnic cuisine category.
+
+```typescript
+faker.food.ethnicCategory()
+// 'Italian'
+```
+
+## ingredient()
+
+Returns a random ingredient name.
+
+```typescript
+faker.food.ingredient()
+// 'butter'
+```
+
+## spice()
+
+Returns a random spice name.
+
+```typescript
+faker.food.spice()
+// 'chilli'
+```
+
+## adjective()
+
+Returns a random culinary adjective.
+
+```typescript
+faker.food.adjective()
+// 'crispy'
+```
+
+## meat()
+
+Returns a random meat name.
+
+```typescript
+faker.food.meat()
+// 'venison'
+```
+
+## vegetable()
+
+Returns a random vegetable name.
+
+```typescript
+faker.food.vegetable()
+// 'broccoli'
+```
+
+## fruit()
+
+Returns a random fruit name.
+
+```typescript
+faker.food.fruit()
+// 'lemon'
+```
+
+## Usage example
+
+```typescript
+import { faker } from '@faker-js/faker';
+
+const menuItem = {
+  name: faker.food.dish(),
+  description: faker.food.description(),
+  cuisine: faker.food.ethnicCategory(),
+  mainIngredient: faker.food.meat(),
+  garnish: faker.food.vegetable(),
+};
+
+// {
+//   name: 'Tagine-Rubbed Venison Salad',
+//   description: 'An exquisite ostrich roast, infused with the essence of longan...',
+//   cuisine: 'Italian',
+//   mainIngredient: 'venison',
+//   garnish: 'broccoli'
+// }
+```

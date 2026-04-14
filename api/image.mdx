@@ -1,0 +1,209 @@
+---
+title: "faker.image — avatar and placeholder image URLs"
+description: "Generate avatar and placeholder image URLs for UI prototyping and testing with faker.image. Returns URLs from public image services."
+---
+
+`faker.image` produces URLs pointing to images hosted on public services, as well as inline data URIs. Use `avatar()` for a random person avatar, `url()` for a generic placeholder image, and `dataUri()` when you need a self-contained SVG with no external dependency.
+
+<Note>
+Faker generates URL strings — it does not fetch or validate the images. The availability of images depends on the external services being online.
+</Note>
+
+## avatar()
+
+Returns a random avatar image URL. Randomly delegates to either `avatarGitHub()` or `personPortrait()`.
+
+```typescript
+faker.image.avatar()
+// 'https://avatars.githubusercontent.com/u/97165289'
+```
+
+---
+
+## avatarGitHub()
+
+Returns a GitHub avatar URL using a random user ID.
+
+```typescript
+faker.image.avatarGitHub()
+// 'https://avatars.githubusercontent.com/u/97165289'
+```
+
+---
+
+## personPortrait()
+
+Returns a URL for an AI-generated portrait of a fictional person, served from the JSDelivr CDN. Images are static files created with Stable Diffusion 3.
+
+```typescript
+faker.image.personPortrait()
+// 'https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/female/512/57.jpg'
+
+faker.image.personPortrait({ sex: 'male', size: 128 })
+// 'https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/male/128/27.jpg'
+```
+
+### Parameters
+
+<ParamField body="options" type="object">
+  Options for the portrait.
+</ParamField>
+
+<ParamField body="options.sex" type="'female' | 'male' | 'generic'" default="faker.person.sexType()">
+  The sex of the person depicted. Pass `'generic'` or omit for a random selection.
+</ParamField>
+
+<ParamField body="options.size" type="512 | 256 | 128 | 64 | 32" default="512">
+  The pixel dimensions of the square image.
+</ParamField>
+
+---
+
+## url()
+
+Returns a random image URL. Currently delegates to `urlPicsumPhotos()` with `grayscale: false` and `blur: 0`. Additional providers may be added in future versions.
+
+```typescript
+faker.image.url()
+// 'https://picsum.photos/seed/NWbJM2B/640/480'
+
+faker.image.url({ width: 1280, height: 720 })
+// 'https://picsum.photos/seed/NWbJM2B/1280/720'
+```
+
+### Parameters
+
+<ParamField body="options" type="object">
+  Options for the image.
+</ParamField>
+
+<ParamField body="options.width" type="number" default="faker.number.int({ min: 1, max: 3999 })">
+  The width of the image in pixels.
+</ParamField>
+
+<ParamField body="options.height" type="number" default="faker.number.int({ min: 1, max: 3999 })">
+  The height of the image in pixels.
+</ParamField>
+
+---
+
+## urlPicsumPhotos()
+
+Returns an image URL from [picsum.photos](https://picsum.photos) with optional grayscale and blur effects.
+
+```typescript
+faker.image.urlPicsumPhotos()
+// 'https://picsum.photos/seed/NWbJM2B/640/480'
+
+faker.image.urlPicsumPhotos({ width: 128 })
+// 'https://picsum.photos/seed/NWbJM2B/128/480'
+
+faker.image.urlPicsumPhotos({ grayscale: true })
+// 'https://picsum.photos/seed/NWbJM2B/640/480?grayscale'
+
+faker.image.urlPicsumPhotos({ blur: 4 })
+// 'https://picsum.photos/seed/NWbJM2B/640/480?blur=4'
+
+faker.image.urlPicsumPhotos({ blur: 4, grayscale: true })
+// 'https://picsum.photos/seed/NWbJM2B/640/480?grayscale&blur=4'
+```
+
+### Parameters
+
+<ParamField body="options" type="object">
+  Options for the Picsum image.
+</ParamField>
+
+<ParamField body="options.width" type="number" default="faker.number.int({ min: 1, max: 3999 })">
+  The width of the image in pixels.
+</ParamField>
+
+<ParamField body="options.height" type="number" default="faker.number.int({ min: 1, max: 3999 })">
+  The height of the image in pixels.
+</ParamField>
+
+<ParamField body="options.grayscale" type="boolean" default="faker.datatype.boolean()">
+  Whether to apply a grayscale filter.
+</ParamField>
+
+<ParamField body="options.blur" type="0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10" default="faker.number.int({ max: 10 })">
+  Blur intensity from `1` to `10`. Pass `0` to disable blur.
+</ParamField>
+
+---
+
+## urlLoremFlickr()
+
+Returns an image URL from loremflickr.com with an optional category.
+
+<Note>
+LoremFlickr is no longer available and URLs will be broken. This method is deprecated since v10.1.0 and will be removed in v11.0.0. Use `faker.image.url()` instead.
+</Note>
+
+```typescript
+faker.image.urlLoremFlickr()
+// 'https://loremflickr.com/640/480?lock=1234'
+
+faker.image.urlLoremFlickr({ category: 'nature' })
+// 'https://loremflickr.com/640/480/nature?lock=1234'
+```
+
+### Parameters
+
+<ParamField body="options" type="object">
+  Options for the LoremFlickr image.
+</ParamField>
+
+<ParamField body="options.width" type="number" default="faker.number.int({ min: 1, max: 3999 })">
+  The width of the image in pixels.
+</ParamField>
+
+<ParamField body="options.height" type="number" default="faker.number.int({ min: 1, max: 3999 })">
+  The height of the image in pixels.
+</ParamField>
+
+<ParamField body="options.category" type="string">
+  A category keyword appended to the URL path, e.g. `'nature'` or `'cats'`.
+</ParamField>
+
+---
+
+## dataUri()
+
+Returns an inline SVG data URI containing a solid-color rectangle with the dimensions printed as a text label. No external requests are made.
+
+<CodeGroup>
+
+```typescript URL-encoded SVG
+faker.image.dataUri()
+// 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http...'
+```
+
+```typescript Base64-encoded SVG
+faker.image.dataUri({ type: 'svg-base64' })
+// 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3...'
+```
+
+</CodeGroup>
+
+### Parameters
+
+<ParamField body="options" type="object">
+  Options for the data URI.
+</ParamField>
+
+<ParamField body="options.width" type="number" default="faker.number.int({ min: 1, max: 3999 })">
+  The width of the SVG in pixels.
+</ParamField>
+
+<ParamField body="options.height" type="number" default="faker.number.int({ min: 1, max: 3999 })">
+  The height of the SVG in pixels.
+</ParamField>
+
+<ParamField body="options.color" type="string" default="faker.color.rgb()">
+  The fill color of the rectangle. Must be a valid SVG color value (e.g. `'#ff0000'`, `'red'`).
+</ParamField>
+
+<ParamField body="options.type" type="'svg-uri' | 'svg-base64'" default="random">
+  The encoding of the data URI. `'svg-uri'` uses percent-encoding; `'svg-base64'` uses Base64.
+</ParamField>

@@ -1,0 +1,82 @@
+---
+title: "faker.science — chemical elements and measurement units"
+description: "Generate chemical element data (name, symbol, atomic number) and scientific measurement units (name and symbol) for science app testing with faker.science."
+---
+
+The `faker.science` module generates scientific data. Both methods return objects rather than plain strings, letting you access individual properties. Use `.name`, `.symbol`, or `.atomicNumber` to extract what you need.
+
+## chemicalElement()
+
+Returns a random periodic table element as an object with `name`, `symbol`, and `atomicNumber` properties.
+
+```typescript
+faker.science.chemicalElement()
+// { symbol: 'H', name: 'Hydrogen', atomicNumber: 1 }
+
+faker.science.chemicalElement()
+// { symbol: 'Xe', name: 'Xenon', atomicNumber: 54 }
+
+faker.science.chemicalElement()
+// { symbol: 'Ce', name: 'Cerium', atomicNumber: 58 }
+
+faker.science.chemicalElement().name         // 'Hydrogen'
+faker.science.chemicalElement().symbol       // 'H'
+faker.science.chemicalElement().atomicNumber // 1
+```
+
+### Return value
+
+<ResponseField name="name" type="string">
+  The full name of the element, e.g. `'Hydrogen'`.
+</ResponseField>
+
+<ResponseField name="symbol" type="string">
+  The one- or two-letter chemical symbol, e.g. `'H'` or `'He'`.
+</ResponseField>
+
+<ResponseField name="atomicNumber" type="number">
+  The atomic number (proton count), e.g. `1` for Hydrogen.
+</ResponseField>
+
+## unit()
+
+Returns a random SI measurement unit as an object with `name` and `symbol` properties.
+
+```typescript
+faker.science.unit()
+// { name: 'meter', symbol: 'm' }
+
+faker.science.unit()
+// { name: 'second', symbol: 's' }
+
+faker.science.unit()
+// { name: 'mole', symbol: 'mol' }
+
+faker.science.unit().name   // 'meter'
+faker.science.unit().symbol // 'm'
+```
+
+### Return value
+
+<ResponseField name="name" type="string">
+  The full unit name, e.g. `'meter'`.
+</ResponseField>
+
+<ResponseField name="symbol" type="string">
+  The unit abbreviation or symbol, e.g. `'m'` or `'mol'`.
+</ResponseField>
+
+## Usage example
+
+```typescript
+import { faker } from '@faker-js/faker';
+
+// Generate a fake lab report entry
+const measurement = {
+  element: faker.science.chemicalElement().name,
+  unit: faker.science.unit().symbol,
+  value: faker.number.float({ min: 0.01, max: 100, fractionDigits: 2 }),
+};
+
+// { element: 'Xenon', unit: 'mol', value: 42.73 }
+```

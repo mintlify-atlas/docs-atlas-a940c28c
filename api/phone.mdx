@@ -1,0 +1,127 @@
+---
+title: "faker.phone — phone numbers in realistic formats"
+description: "Generate realistic phone numbers in human-readable, national, and international formats, plus IMEI device identifiers, with faker.phone. Locale-aware output."
+---
+
+The `faker.phone` module generates realistic phone numbers. You can control the output style — human-readable, standardized national format, or E.123 international format. Many locales provide country-specific number patterns.
+
+## number
+
+Generates a random phone number.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="style" type="'human' | 'national' | 'international' | 'mobile'" default="'human'">
+      Controls the format of the generated phone number:
+
+      - `'human'` — A naturally typed number with variable separators and optional extension, e.g. `555-770-7727` or `555.770.7727 x1234`.
+      - `'national'` — A standardized national format, e.g. `(555) 123-4567`.
+      - `'international'` — E.123 international format with country code, e.g. `+15551234567`.
+      - `'mobile'` — A mobile-specific format where supported by the locale, e.g. `07123456789` in `en_GB`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+<CodeGroup>
+
+```typescript human (default)
+faker.phone.number()
+// '961-770-7727'
+
+faker.phone.number({ style: 'human' })
+// '555.770.7727 x1234'
+```
+
+```typescript national
+faker.phone.number({ style: 'national' })
+// '(961) 770-7727'
+```
+
+```typescript international
+faker.phone.number({ style: 'international' })
+// '+15551234567'
+```
+
+```typescript mobile (locale-specific)
+import { fakerEN_GB as faker } from '@faker-js/faker';
+
+faker.phone.number({ style: 'mobile' })
+// '07123456789'
+```
+
+</CodeGroup>
+
+<Note>
+Not all locales define every style. If a locale does not have definitions for the requested style, Faker throws an error. Check the locale's data before using `'mobile'` in particular.
+</Note>
+
+---
+
+## imei
+
+Generates a random IMEI (International Mobile Equipment Identity) number. IMEIs are used to identify mobile devices.
+
+**Returns:** `string`
+
+```typescript
+faker.phone.imei()  // '13-850175-913761-7'
+```
+
+---
+
+## Examples
+
+<AccordionGroup>
+  <Accordion title="Generate phone numbers in all styles">
+    ```typescript
+    import { faker } from '@faker-js/faker';
+
+    const phoneNumbers = {
+      human: faker.phone.number({ style: 'human' }),
+      national: faker.phone.number({ style: 'national' }),
+      international: faker.phone.number({ style: 'international' }),
+    };
+
+    // {
+    //   human: '555.770.7727 x1234',
+    //   national: '(961) 770-7727',
+    //   international: '+15551234567'
+    // }
+    ```
+  </Accordion>
+
+  <Accordion title="Generate locale-specific phone numbers">
+    ```typescript
+    import { fakerDE, fakerJA, fakerEN_GB } from '@faker-js/faker';
+
+    fakerDE.phone.number({ style: 'international' })
+    // '+4915112345678'
+
+    fakerJA.phone.number({ style: 'national' })
+    // '090-1234-5678'
+
+    fakerEN_GB.phone.number({ style: 'mobile' })
+    // '07123456789'
+    ```
+  </Accordion>
+
+  <Accordion title="Generate a device record with IMEI">
+    ```typescript
+    import { faker } from '@faker-js/faker';
+
+    const device = {
+      imei: faker.phone.imei(),
+      owner: faker.person.fullName(),
+      number: faker.phone.number({ style: 'international' }),
+    };
+
+    // {
+    //   imei: '13-850175-913761-7',
+    //   owner: 'Allen Brown',
+    //   number: '+15551234567'
+    // }
+    ```
+  </Accordion>
+</AccordionGroup>

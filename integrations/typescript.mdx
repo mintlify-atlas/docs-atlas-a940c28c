@@ -1,0 +1,174 @@
+---
+title: "TypeScript Support and Configuration for Faker"
+description: "Configure TypeScript to work with Faker in ESM and CJS projects. Covers moduleResolution, strict mode, SexType, and type-safe factory functions."
+---
+
+Faker is written in TypeScript and ships its own type definitions. No `@types/` package is needed. To get full type checking and accurate IDE completions, your project's `tsconfig.json` must use a compatible `moduleResolution` setting.
+
+## tsconfig requirements
+
+The required `moduleResolution` value depends on whether your project outputs ESM or CJS.
+
+<CodeGroup>
+
+```json tsconfig.json (ESM)
+{
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "strict": true
+  }
+}
+```
+
+```json tsconfig.json (CJS)
+{
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "strict": true
+  }
+}
+```
+
+</CodeGroup>
+
+<AccordionGroup>
+  <Accordion title="Accepted values for ESM projects">
+    The `moduleResolution` option accepts any of the following values for ESM projects:
+
+    - `"Bundler"` — recommended for projects using Vite, esbuild, Webpack, or similar bundlers
+    - `"Node10"` — for Node.js without explicit ESM configuration
+    - `"Node16"` — for Node.js 16 with `"type": "module"` in package.json
+    - `"Node20"` — for Node.js 20+ (requires TypeScript 5.9+)
+    - `"NodeNext"` — follows the current Node.js resolution algorithm
+  </Accordion>
+  <Accordion title="Accepted values for CJS projects">
+    CJS projects have a narrower set of supported values because Faker v10 is ESM-only and relies on the Node.js `require()` ESM interop feature introduced in recent Node versions:
+
+    - `"Bundler"` — recommended when using a bundler
+    - `"Node20"` — requires TypeScript 5.9+ and Node.js 20.19+
+    - `"NodeNext"` — follows the current Node.js resolution algorithm
+
+    Values like `"Node10"` and `"Node16"` are **not** supported for CJS in Faker v10.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  `strict: true` is optional but strongly recommended. Without it, TypeScript will not catch incorrect argument types passed to Faker methods.
+</Note>
+
+## Import paths
+
+Faker exports from two paths:
+
+| Import path | When to use |
+|---|---|
+| `@faker-js/faker` | Full locale bundle. Suitable for scripts and tests where startup time is not a concern. |
+| `@faker-js/faker/locale/en` | English-only data. Smaller bundle; faster startup. Replace `en` with any supported locale code. |
+
+```typescript
+// Full bundle — all locales included
+import { faker } from '@faker-js/faker';
+
+// Locale-specific — only English data loaded
+import { faker } from '@faker-js/faker/locale/en';
+
+// Pre-configured locale instance
+import { fakerDE as faker } from '@faker-js/faker';
+```
+
+## Using Faker types
+
+Faker exports several utility types you can use in your own code.
+
+| Type | Description |
+|---|---|
+| `SexType` | `'male' \| 'female' \| 'generic'` — the return type of `faker.person.sexType()` |
+| `Currency` | Object with `code`, `name`, and `symbol` properties |
+| `LocaleDefinition` | Shape of a full locale data object |
+| `MetadataDefinition` | Locale metadata fields (`title`, `code`, etc.) |
+| `Randomizer` | Interface for providing a custom random number source |
+
+```typescript
+import type { SexType } from '@faker-js/faker';
+```
+
+## Type-safe factory functions
+
+A common pattern is to write factory functions that generate typed test objects. Use `SexType` to keep `sex` and `firstName` consistent with each other.
+
+```typescript
+import { faker } from '@faker-js/faker';
+import type { SexType } from '@faker-js/faker';
+
+type SubscriptionTier = 'free' | 'basic' | 'business';
+
+interface User {
+  _id: string;
+  avatar: string;
+  birthday: Date;
+  email: string;
+  firstName: string;
+  lastName: string;
+  sex: SexType;
+  subscriptionTier: SubscriptionTier;
+}
+
+function createRandomUser(): User {
+  const sex = faker.person.sexType();
+  const firstName = faker.person.firstName(sex);
+  const lastName = faker.person.lastName();
+  const email = faker.internet.email({ firstName, lastName });
+
+  return {
+    _id: faker.string.uuid(),
+    avatar: faker.image.avatar(),
+    birthday: faker.date.birthdate(),
+    email,
+    firstName,
+    lastName,
+    sex,
+    subscriptionTier: faker.helpers.arrayElement(['free', 'basic', 'business']),
+  };
+}
+```
+
+By generating `sex` first and passing it to `firstName`, you avoid mismatches like a female sex value paired with a male first name.
+
+## Overwrite patterns
+
+To make factory functions flexible, accept a `Partial<User>` parameter and let callers override individual fields:
+
+```typescript
+function createRandomUser(overwrites: Partial<User> = {}): User {
+  const {
+    _id = faker.string.uuid(),
+    avatar = faker.image.avatar(),
+    birthday = faker.date.birthdate(),
+    sex = faker.person.sexType(),
+    firstName = faker.person.firstName(sex),
+    lastName = faker.person.lastName(),
+    email = faker.internet.email({ firstName, lastName }),
+    subscriptionTier = faker.helpers.arrayElement([
+      'free',
+      'basic',
+      'business',
+    ]),
+  } = overwrites;
+
+  return {
+    _id,
+    avatar,
+    birthday,
+    email,
+    firstName,
+    lastName,
+    sex,
+    subscriptionTier,
+  };
+}
+
+const user = createRandomUser();
+const futureUser = createRandomUser({ birthday: new Date('2124-10-20') });
+```
+
+TypeScript enforces that every field in `overwrites` matches the `User` interface, so any typo or type mismatch is caught at compile time.

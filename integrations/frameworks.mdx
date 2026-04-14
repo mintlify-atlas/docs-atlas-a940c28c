@@ -1,0 +1,180 @@
+---
+title: "Faker with Vitest, Jest, Cypress, and Playwright"
+description: "Integrate Faker into popular testing frameworks including Vitest, Jest, Cypress, and Playwright with seeding, snapshots, and form-filling examples."
+---
+
+Faker works with all major JavaScript and TypeScript testing frameworks. Whether you are writing unit tests with Vitest or Jest, end-to-end tests with Cypress, or browser automation with Playwright, Faker integrates without any special configuration.
+
+<Tip>
+  All examples below import from `@faker-js/faker/locale/en` rather than `@faker-js/faker`. Locale-specific imports load only the data for that locale, which reduces bundle size and speeds up test startup time. See the [localization guide](/guides/localization) for the full list of available locales.
+</Tip>
+
+## Vitest and Jest
+
+Vitest and Jest use nearly identical APIs. The main difference is that Vitest requires you to import test utilities (`describe`, `it`, `expect`, `afterEach`) explicitly, while Jest provides them as globals.
+
+### Basic test
+
+```typescript vitest
+import { faker } from '@faker-js/faker/locale/en';
+import { describe, expect, it } from 'vitest';
+
+describe('reverse array', () => {
+  it('should reverse the array', () => {
+    const title = faker.person.jobTitle();
+    const name = faker.person.fullName();
+    const animal = faker.animal.bear();
+
+    const array = [title, name, animal];
+
+    expect(array.reverse()).toStrictEqual([animal, name, title]);
+  });
+});
+```
+
+For Jest, remove the import line—everything else is identical.
+
+### Seeded snapshot tests
+
+Seeding Faker with a fixed number makes it produce the same values on every run. This is useful for snapshot tests, which need deterministic output.
+
+<Tabs>
+  <Tab title="Vitest">
+    ```typescript
+    import { faker } from '@faker-js/faker/locale/en';
+    import { afterEach, describe, expect, it } from 'vitest';
+
+    // Re-seed faker after each test so other tests are not affected.
+    afterEach(() => {
+      faker.seed();
+    });
+
+    describe('reverse array', () => {
+      it('should reverse the array', () => {
+        // Seed with a static number for deterministic output.
+        faker.seed(1234);
+        const title = faker.person.jobTitle();
+        const name = faker.person.fullName();
+        const animal = faker.animal.bear();
+
+        const array = [title, name, animal];
+
+        expect(array.reverse()).toStrictEqual([animal, name, title]);
+
+        // This snapshot will always match because the seed is fixed.
+        expect(array.reverse()).toMatchSnapshot();
+      });
+    });
+    ```
+  </Tab>
+  <Tab title="Jest">
+    ```typescript
+    import { faker } from '@faker-js/faker/locale/en';
+
+    // Re-seed faker after each test so other tests are not affected.
+    afterEach(() => {
+      faker.seed();
+    });
+
+    describe('reverse array', () => {
+      it('should reverse the array', () => {
+        // Seed with a static number for deterministic output.
+        faker.seed(1234);
+        const title = faker.person.jobTitle();
+        const name = faker.person.fullName();
+        const animal = faker.animal.bear();
+
+        const array = [title, name, animal];
+
+        expect(array.reverse()).toStrictEqual([animal, name, title]);
+
+        // This snapshot will always match because the seed is fixed.
+        expect(array.reverse()).toMatchSnapshot();
+      });
+    });
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  Calling `faker.seed()` with no arguments re-seeds with a random value, restoring non-deterministic behavior for subsequent tests.
+</Note>
+
+For more on snapshot testing, see the [Vitest snapshot docs](https://vitest.dev/guide/snapshot.html) and [Jest snapshot docs](https://jestjs.io/docs/snapshot-testing).
+
+### Jest and CommonJS (v10+)
+
+Faker v10 is ESM-only. If you are using Jest with CommonJS, see the [upgrade guide](/migration/upgrading#commonjs-still-supported-but-check-your-versions) for the required `jest.config.ts` changes.
+
+## Cypress
+
+Cypress integration requires no special setup. Import Faker at the top of your spec file and call it like any other module.
+
+```typescript
+import { faker } from '@faker-js/faker/locale/en';
+
+describe('Testing the application', () => {
+  it('should create an account with username and password', () => {
+    let username = faker.internet.username();
+    let password = faker.internet.password();
+    let email = faker.internet.exampleEmail();
+
+    // Visit the webpage and create an account.
+    cy.visit('https://www.example.com/register');
+
+    cy.get('#email-input').type(email);
+    cy.get('#username-input').type(username);
+    cy.get('#password-input').type(password);
+    cy.get('#password-confirm-input').type(password);
+
+    cy.get('#register-submit-input').click();
+
+    // Log in with the same credentials.
+    cy.visit('https://www.example.com/login');
+
+    cy.get('#email-input').type(email);
+    cy.get('#password-input').type(password);
+
+    cy.get('#login-submit-input').click();
+
+    // Verify that the login redirected to the dashboard.
+    cy.url().should('include', '/dashboard');
+  });
+});
+```
+
+## Playwright
+
+Playwright tests are `async`/`await` based. Faker values are synchronous, so you can generate them before any `await` calls.
+
+```typescript
+import { faker } from '@faker-js/faker/locale/en';
+import { expect, test } from '@playwright/test';
+
+test.describe('Testing the application', () => {
+  test('should create an account with username and password', async ({
+    page,
+  }) => {
+    const username = faker.internet.username();
+    const password = faker.internet.password();
+    const email = faker.internet.exampleEmail();
+
+    // Visit the webpage and create an account.
+    await page.goto('https://www.example.com/register');
+    await page.getByLabel('email').fill(email);
+    await page.getByLabel('username').fill(username);
+    await page.getByLabel('password', { exact: true }).fill(password);
+    await page.getByLabel('confirm password').fill(password);
+    await page.getByRole('button', { name: 'Register' }).click();
+
+    // Log in with the same credentials.
+    await page.goto('https://www.example.com/login');
+    await page.getByLabel('email').fill(email);
+    await page.getByLabel('password').fill(password);
+    await page.getByRole('button', { name: 'Login' }).click();
+
+    // Verify that the login redirected to the dashboard.
+    await expect(page).toHaveURL(/.*dashboard/);
+  });
+});
+```

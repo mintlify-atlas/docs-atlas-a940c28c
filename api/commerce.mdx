@@ -1,0 +1,172 @@
+---
+title: "faker.commerce — products, prices, and departments"
+description: "Generate product names, adjectives, materials, prices, departments, ISBNs, UPCs, and product descriptions for e-commerce testing with faker.commerce."
+---
+
+The `faker.commerce` module generates product-related data for e-commerce testing. Use it to seed product catalogs, populate shopping cart fixtures, and test pricing logic with realistic-looking data.
+
+## department()
+
+Returns a department name inside a shop.
+
+```typescript
+faker.commerce.department() // 'Garden'
+```
+
+---
+
+## productName()
+
+Generates a random descriptive product name composed of an adjective, material, and product type.
+
+```typescript
+faker.commerce.productName() // 'Incredible Soft Gloves'
+```
+
+<Tip>
+To access the individual components of a product name, use `productAdjective()`, `productMaterial()`, and `product()` separately.
+</Tip>
+
+---
+
+## productAdjective()
+
+Returns an adjective describing a product.
+
+```typescript
+faker.commerce.productAdjective() // 'Handcrafted'
+```
+
+---
+
+## productMaterial()
+
+Returns a material used in a product.
+
+```typescript
+faker.commerce.productMaterial() // 'Rubber'
+```
+
+---
+
+## product()
+
+Returns a short product type name.
+
+```typescript
+faker.commerce.product() // 'Computer'
+```
+
+---
+
+## productDescription()
+
+Returns a product description sentence.
+
+```typescript
+faker.commerce.productDescription()
+// 'Featuring Phosphorus-enhanced technology, our Fish offers unparalleled Modern performance'
+```
+
+---
+
+## price()
+
+Generates a price string between `min` and `max` (inclusive).
+
+To better represent real-world prices, when `dec` is greater than `0`, the final decimal digit is weighted: `9` (50%), `5` (30%), `0` (10%), or a random digit (10%).
+
+<CodeGroup>
+
+```typescript basic
+faker.commerce.price() // '828.07'
+```
+
+```typescript with options
+faker.commerce.price({ min: 100 })                          // '904.19'
+faker.commerce.price({ min: 100, max: 200 })                // '154.55'
+faker.commerce.price({ min: 100, max: 200, dec: 0 })        // '133'
+faker.commerce.price({ min: 100, max: 200, dec: 0, symbol: '$' }) // '$114'
+```
+
+</CodeGroup>
+
+### Parameters
+
+<ParamField body="options.min" type="number" default="1">
+  The minimum price.
+</ParamField>
+
+<ParamField body="options.max" type="number" default="1000">
+  The maximum price.
+</ParamField>
+
+<ParamField body="options.dec" type="number" default="2">
+  The number of decimal places.
+</ParamField>
+
+<ParamField body="options.symbol" type="string" default='""'>
+  A currency symbol prepended to the output (e.g. `'$'`, `'€'`).
+</ParamField>
+
+---
+
+## isbn()
+
+Returns a random [ISBN](https://en.wikipedia.org/wiki/ISBN) identifier. Supports both the 10-digit and 13-digit formats. The check digit is correctly computed according to the ISBN specification.
+
+<CodeGroup>
+
+```typescript basic
+faker.commerce.isbn()    // '978-0-692-82459-7'
+faker.commerce.isbn(10)  // '1-155-36404-X'
+faker.commerce.isbn(13)  // '978-1-60808-867-6'
+```
+
+```typescript with options
+faker.commerce.isbn({ separator: ' ' })                       // '978 0 452 81498 1'
+faker.commerce.isbn({ variant: 10, separator: ' ' })          // '0 940319 49 7'
+faker.commerce.isbn({ variant: 13, separator: ' ' })          // '978 1 6618 9122 0'
+```
+
+</CodeGroup>
+
+### Parameters
+
+Pass a variant number directly (`10` or `13`), or an options object.
+
+<ParamField body="options.variant" type="10 | 13" default="13">
+  The ISBN format. `10` produces a 10-digit ISBN; `13` produces a 13-digit ISBN prefixed with `978`.
+</ParamField>
+
+<ParamField body="options.separator" type="string" default='"-"'>
+  The separator between ISBN groups.
+</ParamField>
+
+<Note>
+The check digit for ISBN-10 can be `X` (representing 10) when required by the checksum algorithm.
+</Note>
+
+---
+
+## upc()
+
+Returns a valid [UPC-A](https://en.wikipedia.org/wiki/Universal_Product_Code) barcode string (12 digits). The check digit is computed using the Modulo 10 algorithm.
+
+<CodeGroup>
+
+```typescript basic
+faker.commerce.upc() // '036000291452'
+```
+
+```typescript with prefix
+faker.commerce.upc({ prefix: '01234' }) // '012345678905'
+```
+
+</CodeGroup>
+
+### Parameters
+
+<ParamField body="options.prefix" type="string">
+  An optional numeric prefix (0–11 digits) for the UPC body. Throws a `FakerError` if the prefix contains non-digit characters or exceeds 11 digits.
+</ParamField>

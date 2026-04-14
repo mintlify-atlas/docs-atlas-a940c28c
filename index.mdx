@@ -1,97 +1,103 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Faker: Realistic Fake Data for Testing"
+description: "Generate realistic fake data in JavaScript and TypeScript. 27 modules, 70+ locales, reproducible seeding, and full TypeScript support for testing and dev."
 ---
 
-## Setting up
+Faker is a powerful TypeScript/JavaScript library for generating realistic fake data — names, addresses, emails, dates, finance data, and much more — perfect for unit tests, performance testing, prototyping, and building demos without a live backend.
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Install Faker and generate your first fake data in under two minutes.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="API Reference" icon="code" href="/api/faker">
+    Explore all 27 modules and their methods with examples and type signatures.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Localization" icon="globe" href="/guides/localization">
+    Generate locale-specific names, addresses, and phone numbers across 70+ locales.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Seeding & Reproducibility" icon="seedling" href="/guides/seeding">
+    Use seeds to produce consistent, reproducible data across test runs.
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## Why Faker?
 
-Everything you need to create world-class documentation.
+Faker provides a single, consistent API to generate realistic test data across every layer of your application stack — from unit tests to end-to-end browser automation.
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
+<CardGroup cols={3}>
+  <Card title="27 Data Modules" icon="cubes">
+    People, locations, finance, commerce, internet, dates, and more — all in one package.
   </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
+  <Card title="70+ Locales" icon="language">
+    Import locale-specific instances like `fakerDE` or `fakerJA` for region-appropriate data.
   </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
+  <Card title="TypeScript First" icon="brackets-curly">
+    Full type definitions included. Works with strict mode and all modern module systems.
   </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
+  <Card title="Reproducible Results" icon="rotate">
+    Seed the PRNG to generate the same values every time — ideal for snapshot tests.
   </Card>
-</Columns>
+  <Card title="Tree-Shakeable" icon="leaf">
+    Import only the locale you need to keep bundle sizes small in browser environments.
+  </Card>
+  <Card title="Node & Browser" icon="browser">
+    Runs in Node.js v20+ and modern browsers. Also available via CDN and Deno.
+  </Card>
+</CardGroup>
 
-## Need inspiration?
+## Get started in seconds
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<Steps>
+  <Step title="Install the package">
+    <CodeGroup>
+      ```bash npm
+      npm install --save-dev @faker-js/faker
+      ```
+      ```bash pnpm
+      pnpm add --save-dev @faker-js/faker
+      ```
+      ```bash yarn
+      yarn add --dev @faker-js/faker
+      ```
+    </CodeGroup>
+  </Step>
+  <Step title="Import and generate data">
+    ```typescript
+    import { faker } from '@faker-js/faker';
+
+    const user = {
+      id: faker.string.uuid(),
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      avatar: faker.image.avatar(),
+      birthdate: faker.date.birthdate(),
+      registeredAt: faker.date.past(),
+    };
+    ```
+  </Step>
+  <Step title="Use locale-specific data (optional)">
+    ```typescript
+    import { fakerDE as faker } from '@faker-js/faker';
+
+    faker.person.firstName(); // 'Lena'
+    faker.location.city();    // 'München'
+    ```
+  </Step>
+</Steps>
+
+## Explore the API
+
+<CardGroup cols={2}>
+  <Card title="People & Places" icon="person" href="/api/person">
+    Names, job titles, addresses, coordinates, phone numbers, emails, and more.
+  </Card>
+  <Card title="Business & Finance" icon="building" href="/api/commerce">
+    Products, prices, company names, account numbers, and crypto addresses.
+  </Card>
+  <Card title="Data & Types" icon="database" href="/api/string">
+    Strings, numbers, dates, UUIDs, booleans, and utility helpers.
+  </Card>
+  <Card title="Domain Modules" icon="grid-2" href="/api/airline">
+    Airline, animal, book, food, git, music, science, system, vehicle, and more.
+  </Card>
+</CardGroup>

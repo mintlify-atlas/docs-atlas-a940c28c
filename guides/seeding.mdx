@@ -1,0 +1,161 @@
+---
+title: "Reproducible Results: Seeding Faker's Random Generator"
+description: "Set a seed on Faker's Mersenne Twister PRNG to produce deterministic, reproducible fake data across test runs and CI environments."
+---
+
+By default, Faker uses a different random seed on every run, so each call returns a different value:
+
+```typescript
+faker.music.genre(); // 'Soul'
+faker.music.genre(); // 'Reggae'
+```
+
+Setting an explicit seed fixes the random sequence so that the same calls in the same order always produce the same output. This is useful for snapshot tests, CI pipelines, and any situation where you need reproducible fake data.
+
+## How faker.seed() works
+
+Call `faker.seed()` with a number before generating data. Reset to the same seed at any point to replay the same sequence from the beginning:
+
+```typescript
+faker.seed(123);
+
+const firstRandom = faker.number.int();
+
+// Resetting to the same seed restarts the sequence.
+faker.seed(123);
+
+const secondRandom = faker.number.int();
+
+console.log(firstRandom === secondRandom); // true
+```
+
+Generated values depend on two things: the seed and the number of calls made since it was set. Inserting or removing any call between the seed and a later call will shift all subsequent values.
+
+## Number seed vs. array seed
+
+`faker.seed()` accepts either a single number or an array of numbers. Arrays allow you to encode more entropy into the seed:
+
+```typescript
+// Single number seed
+faker.seed(42);
+faker.number.int(10); // 4
+faker.number.int(10); // 10
+
+faker.seed(42);
+faker.number.int(10); // 4
+faker.number.int(10); // 10
+
+// Array seed
+faker.seed([42, 13, 17]);
+faker.number.int(10); // 3
+faker.number.int(10); // 10
+
+faker.seed([42, 13, 17]);
+faker.number.int(10); // 3
+faker.number.int(10); // 10
+```
+
+## Reproducible results in tests
+
+A common pattern is to log the seed at the start of each test run so you can reproduce a failure later by hard-coding that seed:
+
+```typescript
+// Log the seed; re-use it to reproduce a specific failure
+console.log('Running test with seed:', faker.seed());
+```
+
+When a test fails, copy the logged seed into your test file:
+
+```typescript
+faker.seed(1674823991);
+// ... reproduce the exact data that caused the failure
+```
+
+<Warning>
+When upgrading to a new version of Faker, the same seed may produce different values. The underlying data sets (names, words, etc.) can change between releases, which shifts the output even if the random sequence itself is identical.
+</Warning>
+
+## Relative dates and setDefaultRefDate()
+
+A seed alone is not enough for reproducibility when using methods that generate dates relative to "today":
+
+- `faker.date.past()`
+- `faker.date.future()`
+- `faker.date.recent()`
+- `faker.date.soon()`
+- `faker.git.commitEntry()`
+- `faker.string.uuid({ version: 7 })`
+
+These methods default to using the current date/time as their reference point. Even with a fixed seed, "today" changes each day, so the output drifts over time.
+
+### Per-call refDate
+
+Pass a fixed date directly to a single method call:
+
+```typescript
+// creates a date soon after 2023-01-01, regardless of when the code runs
+faker.date.soon({ refDate: '2023-01-01T00:00:00.000Z' });
+```
+
+### Global default reference date
+
+Set a default reference date that applies to all subsequent date method calls:
+
+```typescript
+// Use a static date — all relative date methods will use this as "today"
+faker.setDefaultRefDate('2023-01-01T00:00:00.000Z');
+faker.date.past(); // reproducible: always relative to 2023-01-01
+faker.date.soon(); // reproducible: always relative to 2023-01-01
+```
+
+You can also pass a function if you need the reference date to advance on each call:
+
+```typescript
+let clock = new Date('2020-01-01').getTime();
+
+faker.setDefaultRefDate(() => {
+  clock += 1000; // advance by 1 second on every call
+  return new Date(clock);
+});
+
+faker.defaultRefDate(); // 2020-01-01T00:00:01.000Z
+faker.defaultRefDate(); // 2020-01-01T00:00:02.000Z
+```
+
+## Best practices for test frameworks
+
+<AccordionGroup>
+  <Accordion title="Reset the seed in beforeEach">
+    Reset the seed before each test to ensure test isolation. Tests that run in the same process share the same `faker` instance, so a call in one test shifts the sequence for all subsequent tests.
+
+    ```typescript
+    beforeEach(() => {
+      faker.seed(12345);
+      faker.setDefaultRefDate('2024-01-01T00:00:00.000Z');
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Log seeds for random runs">
+    When you want truly random tests that are still reproducible, let Faker pick a random seed and log it:
+
+    ```typescript
+    let testSeed: number;
+
+    beforeEach(() => {
+      testSeed = faker.seed();
+      console.log(`Test seed: ${testSeed}`);
+    });
+    ```
+
+    If a test fails, hard-code `testSeed` to reproduce the exact failure.
+  </Accordion>
+
+  <Accordion title="Use array seeds for multiple locales">
+    When using multiple Faker instances with shared state, array seeds give you more control over how entropy is distributed across instances.
+
+    ```typescript
+    faker.seed([1001, 2002, 3003]);
+    ```
+  </Accordion>
+</AccordionGroup>

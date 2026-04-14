@@ -1,0 +1,102 @@
+---
+title: "faker.git — commit messages and branch names"
+description: "Generate realistic git commit messages, commit entries (with author, date, hash), branch names, and short SHA hashes with faker.git."
+---
+
+The `faker.git` module generates realistic git-style data including full commit log entries, commit messages, commit SHA hashes, commit dates, and branch names. The output format matches what you'd see from `git log`.
+
+## commitMessage()
+
+Returns a random commit message in the style of a hacker verb–adjective–noun phrase.
+
+```typescript
+faker.git.commitMessage()
+// 'reboot cross-platform driver'
+```
+
+## branch()
+
+Returns a random branch name as a `noun-verb` slug.
+
+```typescript
+faker.git.branch()
+// 'feed-parse'
+```
+
+## commitSha()
+
+Returns a random commit SHA hash. Defaults to the full 40-character SHA-1 string. Pass `length` to get a short hash.
+
+<ParamField body="length" type="number" default="40">
+  The length of the hexadecimal hash string. GitHub typically uses 7 characters for short hashes; GitLab uses 8.
+</ParamField>
+
+```typescript
+faker.git.commitSha()
+// '2c6e3880fd94ddb7ef72d34e683cdc0c47bec6e6'
+
+faker.git.commitSha({ length: 7 })
+// 'dbee57b'
+
+faker.git.commitSha({ length: 8 })
+// '0e52376a'
+```
+
+## commitDate()
+
+Returns a git-formatted date string matching the output of `git log --date=default`.
+
+<ParamField body="refDate" type="string | Date | number">
+  The reference point for generating the date. The returned date will be within 1 day before this value. Defaults to `faker.defaultRefDate()` (i.e., now).
+</ParamField>
+
+```typescript
+faker.git.commitDate()
+// 'Mon Nov 7 14:40:58 2022 +0600'
+
+faker.git.commitDate({ refDate: '2020-01-01' })
+// 'Tue Dec 31 05:40:59 2019 -0400'
+```
+
+## commitEntry()
+
+Returns a full commit entry as printed by `git log`, including the commit hash, optional merge line, author, date, and message.
+
+<ParamField body="merge" type="boolean" default="false (20% probability true)">
+  Set to `true` to include a `Merge:` line. By default there is a 20% chance of a merge entry.
+</ParamField>
+
+<ParamField body="eol" type="'LF' | 'CRLF'" default="'CRLF'">
+  The line ending character sequence to use in the output. `'LF'` uses `\n`; `'CRLF'` uses `\r\n`.
+</ParamField>
+
+<ParamField body="refDate" type="string | Date | number">
+  The reference date for the commit timestamp. Defaults to `new Date()`.
+</ParamField>
+
+```typescript
+faker.git.commitEntry()
+// commit fe8c38a965d13d9794eb36918cb24cebe49a45c2
+// Author: Marion Becker <Marion_Becker49@gmail.com>
+// Date: Mon Nov 7 05:38:37 2022 -0600
+//
+//     generate open-source system
+
+faker.git.commitEntry({ merge: true, eol: 'LF' })
+// commit 3f2a1b9c...
+// Merge: a1b2c3d e4f5a6b
+// Author: Jane Smith <jane@example.com>
+// Date: Tue Dec 31 10:22:14 2019 +0000
+//
+//     reboot cross-platform driver
+```
+
+## Usage example
+
+```typescript
+import { faker } from '@faker-js/faker';
+
+// Simulate a short git log output
+const log = Array.from({ length: 3 }, () => faker.git.commitEntry({ eol: 'LF' }));
+console.log(log.join('\n'));
+```

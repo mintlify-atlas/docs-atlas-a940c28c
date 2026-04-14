@@ -1,0 +1,229 @@
+---
+title: "Localization: 70+ Locales for Realistic Regional Data"
+description: "Use Faker's 70+ pre-built locale instances like fakerDE or fakerJA to generate region-specific names, addresses, and phone numbers."
+---
+
+Faker ships with pre-built instances for more than 70 locales. Swapping locale is as simple as changing your import — every locale instance exposes the same API, so no other code changes are needed.
+
+## Switching locales
+
+The default `faker` export produces English data. To use a different locale, import its named instance instead:
+
+```typescript
+import { fakerDE as faker } from '@faker-js/faker';
+
+faker.person.fullName(); // 'Erika Mustermann'
+faker.location.city();   // 'München'
+```
+
+Every pre-built instance follows the same `faker<LOCALE_CODE>` naming convention. For example:
+
+| Import | Language |
+|---|---|
+| `fakerDE` | German |
+| `fakerJA` | Japanese |
+| `fakerZH_CN` | Chinese (China) |
+| `fakerPT_BR` | Portuguese (Brazil) |
+
+## Custom locales and fallbacks
+
+If the built-in instances do not satisfy your requirements, construct your own `Faker` with a custom locale definition and an explicit fallback chain:
+
+```typescript
+import type { LocaleDefinition } from '@faker-js/faker';
+import { base, de, de_CH, en, Faker } from '@faker-js/faker';
+
+const customLocale: LocaleDefinition = {
+  title: 'My custom locale',
+  internet: {
+    domainSuffix: ['test'],
+  },
+};
+
+export const customFaker = new Faker({
+  locale: [customLocale, de_CH, de, en, base],
+});
+```
+
+Faker checks locales in order and uses the first one that contains the requested data:
+
+1. **`customLocale`** — your overrides, applied first
+2. **`de_CH`** — Swiss German data, overrides standard German where they differ
+3. **`de`** — Standard German data
+4. **`en`** — English data, fills gaps not covered by the German locales
+5. **`base`** — Locale-independent data (emojis, etc.)
+
+<Tip>
+Including `en` as a fallback is optional. It gives the broadest coverage but increases the data loaded at startup.
+</Tip>
+
+## Available locales
+
+| Locale | Name | Import |
+|:---|:---|:---|
+| `af_ZA` | Afrikaans (South Africa) | `fakerAF_ZA` |
+| `ar` | Arabic | `fakerAR` |
+| `az` | Azerbaijani | `fakerAZ` |
+| `bn_BD` | Bengali (Bangladesh) | `fakerBN_BD` |
+| `cs_CZ` | Czech (Czechia) | `fakerCS_CZ` |
+| `cy` | Welsh | `fakerCY` |
+| `da` | Danish | `fakerDA` |
+| `de` | German | `fakerDE` |
+| `de_AT` | German (Austria) | `fakerDE_AT` |
+| `de_CH` | German (Switzerland) | `fakerDE_CH` |
+| `el` | Greek | `fakerEL` |
+| `en` | English | `fakerEN` |
+| `en_AU` | English (Australia) | `fakerEN_AU` |
+| `en_CA` | English (Canada) | `fakerEN_CA` |
+| `en_GB` | English (Great Britain) | `fakerEN_GB` |
+| `en_GH` | English (Ghana) | `fakerEN_GH` |
+| `en_HK` | English (Hong Kong) | `fakerEN_HK` |
+| `en_IE` | English (Ireland) | `fakerEN_IE` |
+| `en_IN` | English (India) | `fakerEN_IN` |
+| `en_NG` | English (Nigeria) | `fakerEN_NG` |
+| `en_US` | English (United States) | `fakerEN_US` |
+| `en_ZA` | English (South Africa) | `fakerEN_ZA` |
+| `eo` | Esperanto | `fakerEO` |
+| `es` | Spanish | `fakerES` |
+| `es_MX` | Spanish (Mexico) | `fakerES_MX` |
+| `fa` | Farsi/Persian | `fakerFA` |
+| `fi` | Finnish | `fakerFI` |
+| `fr` | French | `fakerFR` |
+| `fr_BE` | French (Belgium) | `fakerFR_BE` |
+| `fr_CA` | French (Canada) | `fakerFR_CA` |
+| `fr_CH` | French (Switzerland) | `fakerFR_CH` |
+| `fr_LU` | French (Luxembourg) | `fakerFR_LU` |
+| `he` | Hebrew | `fakerHE` |
+| `hr` | Croatian | `fakerHR` |
+| `hu` | Hungarian | `fakerHU` |
+| `id_ID` | Indonesian (Indonesia) | `fakerID_ID` |
+| `it` | Italian | `fakerIT` |
+| `ja` | Japanese | `fakerJA` |
+| `ko` | Korean | `fakerKO` |
+| `lv` | Latvian | `fakerLV` |
+| `nl` | Dutch | `fakerNL` |
+| `nl_BE` | Dutch (Belgium) | `fakerNL_BE` |
+| `pl` | Polish | `fakerPL` |
+| `pt_BR` | Portuguese (Brazil) | `fakerPT_BR` |
+| `pt_PT` | Portuguese (Portugal) | `fakerPT_PT` |
+| `ro` | Romanian | `fakerRO` |
+| `ru` | Russian | `fakerRU` |
+| `sk` | Slovak | `fakerSK` |
+| `sv` | Swedish | `fakerSV` |
+| `tr` | Turkish | `fakerTR` |
+| `uk` | Ukrainian | `fakerUK` |
+| `vi` | Vietnamese | `fakerVI` |
+| `zh_CN` | Chinese (China) | `fakerZH_CN` |
+| `zh_TW` | Chinese (Taiwan) | `fakerZH_TW` |
+
+The `Locale` data and `Faker` instance names can be used directly in imports:
+
+```typescript
+import { de, fakerDE } from '@faker-js/faker';
+```
+
+<Note>
+Some locales have limited coverage and rely more heavily on the English locale for features they do not yet have. Using a specific locale still reduces startup time because it narrows the data set loaded — this has a compounding effect in test frameworks that re-import modules on every run.
+</Note>
+
+## Locale code naming convention
+
+Locale codes follow a systematic pattern:
+
+<Steps>
+  <Step title="Language code">
+    Two lowercase characters from the [ISO 639-1 standard](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes). For example, `ar` for Arabic and `en` for English.
+  </Step>
+  <Step title="Country code (optional)">
+    An underscore followed by two uppercase characters from the [ISO 3166-1 alpha-2 standard](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). For example, `en_US` (English, United States) and `en_AU` (English, Australia).
+  </Step>
+  <Step title="Variant (optional)">
+    A second underscore and a variant identifier for dialects or scripts. For example, `en_AU_ocker` (Australian English, "Ocker" dialect) or `sr_RS_latin` (Serbian, Latin script).
+  </Step>
+</Steps>
+
+## allFakers and allLocales
+
+When you need to enumerate all available locales at runtime, use the `allFakers` and `allLocales` exports:
+
+```typescript
+import { allFakers, allLocales } from '@faker-js/faker';
+
+console.dir(allFakers['de_AT']); // the prebuilt Faker instance for de_AT
+console.dir(allLocales['de_AT']); // the raw locale definitions for de_AT
+```
+
+This is useful for generating sample output across every locale:
+
+```typescript
+import { allFakers } from '@faker-js/faker';
+
+for (let key of Object.keys(allFakers)) {
+  try {
+    console.log(
+      `In locale ${key}, a sample name is ${allFakers[key].person.fullName()}`
+    );
+  } catch (e) {
+    console.log(`In locale ${key}, an error occurred: ${e}`);
+  }
+}
+```
+
+## Handling missing data errors
+
+```
+[Error]: The locale data for 'category.entry' are missing in this locale.
+Please contribute the missing data to the project or use a locale/Faker instance that has these data.
+```
+
+This error means the locale you are using does not yet have data for the method you called. The recommended fix is to contribute the missing data. As a workaround, add broader fallbacks to your `Faker` constructor:
+
+```typescript
+import { Faker, base, el, en } from '@faker-js/faker';
+
+const faker = new Faker({
+  locale: [el, en, base],
+});
+console.log(faker.location.country()); // 'Belgium'
+```
+
+## Handling not-applicable data errors
+
+```
+[Error]: The locale data for 'category.entry' aren't applicable to this locale.
+If you think this is a bug, please report it at: https://github.com/faker-js/faker
+```
+
+This error means the locale explicitly marks the data as unavailable — not missing, but intentionally absent. For example, Hong Kong does not use zip codes, so `en_HK` sets that entry to `null`:
+
+```typescript
+import { fakerEN_HK } from '@faker-js/faker';
+
+console.log(fakerEN_HK.location.zipCode()); // Error
+```
+
+<Warning>
+Because `null` is treated as present data, fallback locales are **not** consulted for `null` entries. The override locale must come **before** the locale that contains `null` in the fallback array.
+</Warning>
+
+To supply your own fallback data for a `null` entry, inject the replacement definition ahead of the locale that nulls it out:
+
+```typescript
+import { Faker, en, en_HK } from '@faker-js/faker';
+
+const faker = new Faker({
+  locale: [{ location: { postcode: en.location.postcode } }, en_HK],
+});
+console.log(faker.location.zipCode()); // '17551-0348'
+```
+
+The following does **not** work because `en_HK` is checked first and its `null` value takes precedence:
+
+```typescript
+import { Faker, en, en_HK } from '@faker-js/faker';
+
+const faker = new Faker({
+  locale: [en_HK, { location: { postcode: en.location.postcode } }],
+});
+console.log(faker.location.zipCode()); // Error
+```

@@ -1,0 +1,131 @@
+---
+title: "faker.airline — flight data, airports, and aircraft"
+description: "Generate airline IATA codes, airport names, flight numbers, seat numbers, record locators, and aircraft types for travel app testing with faker.airline."
+---
+
+The `faker.airline` module generates realistic aviation data including airports, airlines, aircraft types, flight numbers, seat assignments, and booking record locators. Methods that return objects let you access individual properties such as `.iataCode` or `.name` directly.
+
+## airport()
+
+Returns a random airport as an object with `name` and `iataCode` properties.
+
+```typescript
+faker.airline.airport()
+// { name: 'Dallas Fort Worth International Airport', iataCode: 'DFW' }
+
+faker.airline.airport().iataCode // 'DFW'
+faker.airline.airport().name     // 'Dallas Fort Worth International Airport'
+```
+
+## airline()
+
+Returns a random airline as an object with `name` and `iataCode` properties.
+
+```typescript
+faker.airline.airline()
+// { name: 'American Airlines', iataCode: 'AA' }
+
+faker.airline.airline().iataCode // 'AA'
+```
+
+## airplane()
+
+Returns a random airplane as an object with `name` and `iataTypeCode` properties.
+
+```typescript
+faker.airline.airplane()
+// { name: 'Airbus A321neo', iataTypeCode: '32Q' }
+```
+
+## flightNumber()
+
+Returns a random flight number. Flight numbers are 1–4 digits. Use `addLeadingZeros` to pad to 4 digits, which is common when prefixing an airline code.
+
+<ParamField body="length" type="number | { min: number; max: number }" default="{ min: 1, max: 4 }">
+  The number of digits to generate. Pass a range object to randomize the length within bounds.
+</ParamField>
+
+<ParamField body="addLeadingZeros" type="boolean" default="false">
+  Pad the flight number with leading zeros up to 4 digits total.
+</ParamField>
+
+```typescript
+faker.airline.flightNumber()
+// '2405'
+
+faker.airline.flightNumber({ addLeadingZeros: true })
+// '0249'
+
+faker.airline.flightNumber({ addLeadingZeros: true, length: 2 })
+// '0042'
+
+faker.airline.flightNumber({ length: { min: 2, max: 3 } })
+// '84'
+```
+
+<Tip>
+To generate a full flight code with an airline prefix, combine `airline()` and `flightNumber()`:
+
+```typescript
+`${faker.airline.airline().iataCode}${faker.airline.flightNumber({ addLeadingZeros: true })}`
+// 'AA0798'
+```
+</Tip>
+
+## seat()
+
+Returns a random seat number such as `'22C'`. The format depends on the aircraft type, which controls the number of rows and available seat letters.
+
+<ParamField body="aircraftType" type="'narrowbody' | 'regional' | 'widebody'" default="'narrowbody'">
+  The aircraft type. Controls seat row range and available seat letters:
+
+  - `regional` — rows 1–20, seats A–D
+  - `narrowbody` — rows 1–35, seats A–F
+  - `widebody` — rows 1–60, seats A–K (excluding I)
+</ParamField>
+
+```typescript
+faker.airline.seat()
+// '22C'
+
+faker.airline.seat({ aircraftType: 'regional' })
+// '7A'
+
+faker.airline.seat({ aircraftType: 'widebody' })
+// '42K'
+```
+
+## aircraftType()
+
+Returns a random aircraft type string: `'narrowbody'`, `'regional'`, or `'widebody'`.
+
+```typescript
+faker.airline.aircraftType()
+// 'narrowbody'
+```
+
+## recordLocator()
+
+Returns a random 6-character booking record locator (also called a PNR, confirmation code, or reservation reference). By default, visually ambiguous characters such as `0`/`O` and `1`/`I`/`L` are excluded.
+
+<ParamField body="allowNumerics" type="boolean" default="false">
+  Allow numeric characters (`0`–`9`) in the locator.
+</ParamField>
+
+<ParamField body="allowVisuallySimilarCharacters" type="boolean" default="false">
+  Allow characters that look alike: `0`, `O`, `1`, `I`, `L`.
+</ParamField>
+
+```typescript
+faker.airline.recordLocator()
+// 'KIFRWE'
+
+faker.airline.recordLocator({ allowNumerics: true })
+// 'E5TYEM'
+
+faker.airline.recordLocator({ allowVisuallySimilarCharacters: true })
+// 'ANZNEI'
+
+faker.airline.recordLocator({ allowNumerics: true, allowVisuallySimilarCharacters: true })
+// '1Z2Z3E'
+```

@@ -1,0 +1,160 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "Faker",
+  "projectDescription": "A TypeScript/JavaScript library for generating massive amounts of realistic fake data for testing and development, with support for 70+ locales.",
+  "theme": "luma",
+  "primaryColor": "#716868",
+  "lightColor": "#503e3e",
+  "darkColor": "#d3d3d3",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/usage",
+              "guides/localization",
+              "guides/seeding",
+              "guides/unique-values",
+              "guides/custom-randomizer"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "integrations/frameworks",
+              "integrations/typescript"
+            ]
+          },
+          {
+            "group": "Migration",
+            "pages": [
+              "migration/upgrading"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api/faker",
+              "api/simple-faker"
+            ]
+          },
+          {
+            "group": "People & Places",
+            "pages": [
+              "api/person",
+              "api/location",
+              "api/phone",
+              "api/internet"
+            ]
+          },
+          {
+            "group": "Business & Finance",
+            "pages": [
+              "api/commerce",
+              "api/company",
+              "api/finance"
+            ]
+          },
+          {
+            "group": "Data & Types",
+            "pages": [
+              "api/string",
+              "api/number",
+              "api/datatype",
+              "api/date",
+              "api/helpers"
+            ]
+          },
+          {
+            "group": "Content & Media",
+            "pages": [
+              "api/lorem",
+              "api/image",
+              "api/color",
+              "api/word"
+            ]
+          },
+          {
+            "group": "Domain Modules",
+            "pages": [
+              "api/airline",
+              "api/animal",
+              "api/book",
+              "api/database",
+              "api/food",
+              "api/git",
+              "api/hacker",
+              "api/music",
+              "api/science",
+              "api/system",
+              "api/vehicle"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "27 data modules covering people, locations, dates, finance, commerce, and more",
+    "70+ supported locales for generating region-specific realistic data",
+    "Reproducible results via seeding with Mersenne Twister PRNG",
+    "Tree-shakeable locale-specific imports for optimized bundle size",
+    "TypeScript-first with full type definitions",
+    "Works in both Node.js and browser environments",
+    "Custom randomizer support for integration with third-party RNG libraries",
+    "SimpleFaker for locale-independent data generation with minimal footprint"
+  ],
+  "publicApiSurface": [
+    "faker (default English instance)",
+    "Faker (class for custom locale instances)",
+    "SimpleFaker (locale-independent instance)",
+    "simpleFaker (default SimpleFaker instance)",
+    "faker.person — names, titles, job info",
+    "faker.location — addresses, coordinates, zip codes",
+    "faker.internet — emails, URLs, usernames, passwords",
+    "faker.date — past/future/recent dates, birthdate",
+    "faker.finance — account numbers, crypto, transactions",
+    "faker.commerce — products, prices, departments",
+    "faker.company — company names, buzzwords",
+    "faker.string — uuid, alphanumeric, nanoid",
+    "faker.number — int, float, binary, octal",
+    "faker.helpers — arrayElement, multiple, fake, uniqueArray",
+    "faker.lorem — words, sentences, paragraphs",
+    "faker.image — avatar, url",
+    "faker.color — rgb, hsl, human-readable",
+    "faker.airline — flight data, airports, seats",
+    "faker.animal — specific animal types",
+    "faker.book — titles, authors, genres",
+    "faker.database — column names, types, engines",
+    "faker.food — dish names, ingredients, descriptions",
+    "faker.git — commit messages, branch names",
+    "faker.hacker — jargon phrases",
+    "faker.music — genres, song names",
+    "faker.phone — phone numbers",
+    "faker.science — chemical elements, units",
+    "faker.system — file names, MIME types",
+    "faker.vehicle — makes, models, VINs",
+    "faker.word — adjectives, nouns, verbs",
+    "faker.seed() — set reproducible seed",
+    "faker.setDefaultRefDate() — set reference date for relative dates",
+    "fakerDE, fakerFR, fakerZH_CN, ... (70+ locale-specific instances)",
+    "allFakers, allLocales — access all locale instances/definitions",
+    "mergeLocales() — combine locale definitions",
+    "generateMersenne32Randomizer(), generateMersenne53Randomizer()"
+  ]
+}

@@ -1,0 +1,97 @@
+---
+title: "Generating Unique Values with Faker"
+description: "Strategies for generating unique fake values with Faker, including uniqueArray(), sequential suffixes, and tracking sets for deduplication."
+---
+
+Faker does not guarantee unique values. By design, its methods draw from finite data sets, and the same value can be returned on consecutive calls:
+
+```typescript
+faker.seed(55);
+faker.animal.type(); // 'cat'
+faker.animal.type(); // 'bird'
+faker.animal.type(); // 'horse'
+faker.animal.type(); // 'horse'
+```
+
+## Why uniqueness is not guaranteed
+
+Some data sets are small. `faker.animal.type()` has only 44 possible values. Even methods with larger data sets — like `faker.person.fullName()`, which draws from hundreds of first names, surnames, and prefixes — will produce duplicates relatively quickly due to the [birthday paradox](https://en.wikipedia.org/wiki/Birthday_Paradox).
+
+When you need unique values (for example, to populate a database column with a unique constraint), you have several options.
+
+## faker.helpers.uniqueArray()
+
+If you need all your values at once, `uniqueArray()` is the simplest approach. It draws from the data source repeatedly until it has the requested number of distinct values:
+
+```typescript
+// Generate 1000 unique email addresses
+faker.helpers.uniqueArray(faker.internet.email, 1000);
+```
+
+Pass a function reference (not a call) as the first argument. `uniqueArray()` will call it repeatedly until it has collected enough unique values.
+
+<Warning>
+If the data source has fewer distinct values than the count you requested, `uniqueArray()` will exhaust the available values and return fewer items than expected. Check the size of the underlying data set before relying on a specific count.
+</Warning>
+
+## Sequential prefix or suffix strategy
+
+When the data set is too small to satisfy your count with `uniqueArray()`, append a sequential number to each generated value:
+
+```typescript
+const emails = Array.from({ length: 10000 }, (_, i) =>
+  `${i + 1}.${faker.internet.email()}`
+);
+// ['1.alice@example.com', '2.bob@example.org', ...]
+```
+
+This guarantees uniqueness regardless of how many values you need, at the cost of slightly less realistic-looking data.
+
+## Custom tracking set
+
+Build your own deduplication logic by keeping a `Set` of previously generated values and retrying on collision:
+
+```typescript
+const seen = new Set<string>();
+
+function uniqueEmail(): string {
+  let email: string;
+  do {
+    email = faker.internet.email();
+  } while (seen.has(email));
+  seen.add(email);
+  return email;
+}
+
+const emails = Array.from({ length: 100 }, uniqueEmail);
+```
+
+<Note>
+Add a maximum retry limit to avoid an infinite loop if the data set is exhausted:
+
+```typescript
+function uniqueEmail(maxRetries = 1000): string {
+  for (let i = 0; i < maxRetries; i++) {
+    const email = faker.internet.email();
+    if (!seen.has(email)) {
+      seen.add(email);
+      return email;
+    }
+  }
+  throw new Error('Could not generate a unique email after maximum retries');
+}
+```
+</Note>
+
+## Third-party packages
+
+<CardGroup cols={2}>
+  <Card title="enforce-unique" href="https://github.com/MansurAliKoroglu/enforce-unique">
+    Wraps any function and enforces uniqueness across calls. Configurable retry logic and error handling.
+  </Card>
+  <Card title="@dpaskhin/unique" href="https://github.com/dPaskhin/unique">
+    Decorator-style unique value enforcement with support for scoped uniqueness contexts.
+  </Card>
+</CardGroup>
+
+Both packages integrate with Faker by wrapping individual method calls, so you can drop them into an existing factory function without restructuring your code.

@@ -1,0 +1,456 @@
+---
+title: "faker.helpers — array, object, and template utilities"
+description: "Utility methods for picking array elements, shuffling, generating multiple values, mustache templates, and working with enums with faker.helpers."
+---
+
+The `faker.helpers` module provides building-block utilities used throughout Faker. These methods are especially useful when you need to add custom data that Faker doesn't natively provide, generate structured output, or build strings from templates.
+
+## Array utilities
+
+### arrayElement
+
+Returns a single random element from the given array.
+
+<ParamField path="array" type="T[]" required>
+  The array to pick from. Must not be empty.
+</ParamField>
+
+```javascript
+faker.helpers.arrayElement(['cat', 'dog', 'mouse'])
+// 'dog'
+```
+
+---
+
+### arrayElements
+
+Returns a subset of the array in random order.
+
+<ParamField path="array" type="T[]" required>
+  The source array.
+</ParamField>
+
+<ParamField path="count" type="number | { min: number; max: number }">
+  How many elements to pick. When omitted, a random count between 1 and the array length is used.
+</ParamField>
+
+```javascript
+faker.helpers.arrayElements(['cat', 'dog', 'mouse'])
+// ['mouse', 'cat']
+
+faker.helpers.arrayElements([1, 2, 3, 4, 5], 2)
+// [4, 2]
+
+faker.helpers.arrayElements([1, 2, 3, 4, 5], { min: 2, max: 4 })
+// [3, 5, 1]
+```
+
+---
+
+### weightedArrayElement
+
+Returns a random element from an array according to the given weights. Higher weights increase the probability of that element being selected.
+
+<ParamField path="array" type="Array<{ weight: number; value: T }>" required>
+  Array of objects with `weight` (positive number) and `value` fields.
+</ParamField>
+
+```javascript
+faker.helpers.weightedArrayElement([
+  { weight: 5, value: 'sunny' },
+  { weight: 4, value: 'rainy' },
+  { weight: 1, value: 'snowy' },
+])
+// 'sunny' — returned 50% of the time
+// 'rainy' — returned 40% of the time
+// 'snowy' — returned 10% of the time
+```
+
+---
+
+### shuffle
+
+Returns a shuffled copy of the array. Pass `{ inplace: true }` to shuffle the original array in place.
+
+<ParamField path="list" type="T[]" required>
+  The array to shuffle.
+</ParamField>
+
+<ParamField path="options.inplace" type="boolean">
+  If `true`, shuffles the original array and returns it. Defaults to `false`.
+</ParamField>
+
+```javascript
+faker.helpers.shuffle(['a', 'b', 'c'])
+// [ 'b', 'c', 'a' ]
+
+faker.helpers.shuffle(['a', 'b', 'c'], { inplace: true })
+// [ 'b', 'c', 'a' ] (original array modified)
+
+faker.helpers.shuffle(['a', 'b', 'c'], { inplace: false })
+// [ 'b', 'c', 'a' ] (new array returned)
+```
+
+---
+
+### uniqueArray
+
+Returns an array of unique values from the given source (array or generator function).
+
+<ParamField path="source" type="T[] | (() => T)" required>
+  An array of values to sample from, or a function that generates a value. When a function is provided, it is called repeatedly until enough unique values are collected or a maximum attempt limit is reached.
+</ParamField>
+
+<ParamField path="length" type="number" required>
+  Number of unique elements to return.
+</ParamField>
+
+```javascript
+faker.helpers.uniqueArray(faker.word.sample, 3)
+// ['mob', 'junior', 'ripe']
+
+faker.helpers.uniqueArray(['Hello', 'World', 'Goodbye'], 2)
+// ['World', 'Goodbye']
+```
+
+---
+
+## Generating multiple values
+
+### multiple
+
+Generates an array of values by calling the given function `count` times.
+
+<ParamField path="method" type="(v: unknown, index: number) => TResult" required>
+  The function to call for each element. Receives the index as the second argument.
+</ParamField>
+
+<ParamField path="options.count" type="number | { min: number; max: number }">
+  Number of elements to generate. Defaults to `3`.
+</ParamField>
+
+```javascript
+faker.helpers.multiple(() => faker.person.firstName())
+// [ 'Aniya', 'Norval', 'Dallin' ]
+
+faker.helpers.multiple(() => faker.person.firstName(), { count: 3 })
+// [ 'Santos', 'Lavinia', 'Lavinia' ]
+
+faker.helpers.multiple((_, i) => `${faker.color.human()}-${i + 1}`)
+// [ 'orange-1', 'orchid-2', 'sky blue-3' ]
+```
+
+---
+
+## Template strings
+
+### fake
+
+Generates a string by resolving `{{module.method}}` placeholders using Faker methods. Useful when building strings from non-executable sources such as user input or database records.
+
+<ParamField path="pattern" type="string | string[]" required>
+  A template string (or array of template strings to pick from) containing `{{module.method}}` placeholders.
+</ParamField>
+
+<Note>
+  For code you control, prefer template literals (e.g., `` `${faker.person.firstName()} ${faker.person.lastName()}` ``), which are faster and fully type-safe in TypeScript. Use `fake()` only when the pattern comes from an external source.
+</Note>
+
+<CodeGroup>
+
+```javascript basic templates
+faker.helpers.fake('{{person.lastName}}')
+// 'Barrows'
+
+faker.helpers.fake('{{person.lastName}}, {{person.firstName}} {{person.suffix}}')
+// 'Durgan, Noe MD'
+
+faker.helpers.fake('Good Morning {{person.firstName}}!')
+// 'Good Morning Estelle!'
+```
+
+```javascript with parameters
+faker.helpers.fake('You can visit me at {{location.streetAddress(true)}}.')
+// 'You can visit me at 3393 Ronny Way Apt. 742.'
+
+faker.helpers.fake('Your PIN number is: {{string.numeric(4, {"exclude": ["0"]})}}')
+// 'Your PIN number is: 4834'
+
+faker.helpers.fake('I flipped the coin and got: {{helpers.arrayElement(["heads", "tails"])}}')
+// 'I flipped the coin and got: tails'
+```
+
+```javascript array of patterns
+faker.helpers.fake(['A: {{person.firstName}}', 'B: {{person.lastName}}'])
+// 'A: Barry'
+```
+
+</CodeGroup>
+
+---
+
+### mustache
+
+Replaces `{{placeholder}}` patterns in a template string using a data map of strings or replacement functions.
+
+<ParamField path="text" type="string" required>
+  The template string containing `{{placeholder}}` tokens.
+</ParamField>
+
+<ParamField path="data" type="Record<string, string | Function>" required>
+  A map from placeholder name to a string value or a `String.prototype.replace`-compatible function.
+</ParamField>
+
+```javascript
+faker.helpers.mustache(
+  'I found {{count}} instances of "{{word}}".',
+  {
+    count: () => `${faker.number.int()}`,
+    word: 'this word',
+  }
+)
+// 'I found 57591 instances of "this word".'
+```
+
+---
+
+### fromRegExp
+
+Generates a string that matches the given regex-like expression or `RegExp` object.
+
+<ParamField path="pattern" type="string | RegExp" required>
+  The pattern to match. Supports a subset of RegExp syntax (see supported patterns below).
+</ParamField>
+
+<Note>
+  This method does not support full `RegExp` features such as grouping, anchors, or lookaheads. For full RegExp string generation, see [randexp.js](https://github.com/fent/randexp.js).
+</Note>
+
+<AccordionGroup>
+  <Accordion title="Supported patterns">
+
+    | Pattern | Description |
+    |---|---|
+    | `x{n}` | Repeat `x` exactly `n` times |
+    | `x{min,max}` | Repeat `x` between `min` and `max` times |
+    | `[x-y]` | Random character in the range `x`–`y` |
+    | `[x-y]{n}` | Random character in range, repeated `n` times |
+    | `[^...]` | Random ASCII letter/digit not in the range |
+    | `[-...]` | Include literal dashes in the range |
+    | `/[x-y]/i` | Case-insensitive character range |
+    | `x?` | Optionally include `x` |
+    | `x*` | Repeat `x` zero or more times |
+    | `x+` | Repeat `x` one or more times |
+    | `.` | Any ASCII alphanumeric or symbol character |
+
+  </Accordion>
+</AccordionGroup>
+
+<CodeGroup>
+
+```javascript string patterns
+faker.helpers.fromRegExp('#{5}')
+// '#####'
+
+faker.helpers.fromRegExp('#{2,9}')
+// '#######'
+
+faker.helpers.fromRegExp('[1-7]')
+// '5'
+
+faker.helpers.fromRegExp('[0-9a-dmno]')
+// '5'
+
+faker.helpers.fromRegExp('[^a-zA-Z0-8]')
+// '9'
+
+faker.helpers.fromRegExp('[a-d0-6]{2,8}')
+// 'a0dc45b0'
+```
+
+```javascript RegExp objects
+faker.helpers.fromRegExp(/[A-Z0-9]{4}-[A-Z0-9]{4}/)
+// 'BS4G-485H'
+
+faker.helpers.fromRegExp(/[A-Z]{5}/i)
+// 'pDKfh'
+
+faker.helpers.fromRegExp(/.{5}/)
+// '14(#B'
+
+faker.helpers.fromRegExp(/Joh?n/)
+// 'Jon'
+
+faker.helpers.fromRegExp(/bee+p/)
+// 'beeeeeeeep'
+```
+
+</CodeGroup>
+
+---
+
+## String symbol replacement
+
+### replaceSymbols
+
+Replaces placeholder characters in a string:
+
+- `#` → a random digit (`0`–`9`)
+- `?` → a random uppercase letter (`A`–`Z`)
+- `*` → a random digit or uppercase letter
+
+<ParamField path="string" type="string">
+  The template string to process. Defaults to `''`.
+</ParamField>
+
+```javascript
+faker.helpers.replaceSymbols('#####')
+// '98441'
+
+faker.helpers.replaceSymbols('?????')
+// 'ZYRQQ'
+
+faker.helpers.replaceSymbols('*****')
+// '4Z3P7'
+
+faker.helpers.replaceSymbols('Your pin is: #?*#?*')
+// 'Your pin is: 0T85L1'
+```
+
+---
+
+### replaceCreditCardSymbols
+
+Generates a credit card number string by replacing symbols and computing the Luhn check digit (`L`).
+
+<ParamField path="string" type="string">
+  The credit card format pattern. Defaults to `'6453-####-####-####-###L'`.
+</ParamField>
+
+<ParamField path="symbol" type="string">
+  The character to replace with digits. Defaults to `'#'`.
+</ParamField>
+
+```javascript
+faker.helpers.replaceCreditCardSymbols()
+// '6453-4876-8626-8995-3771'
+
+faker.helpers.replaceCreditCardSymbols('1234-[4-9]-##!!-L')
+// '1234-9-5298-2'
+```
+
+---
+
+### slugify
+
+Converts a string into a URL-friendly slug: spaces become hyphens and most non-word characters are removed.
+
+<ParamField path="string" type="string">
+  The input string. Defaults to `''`.
+</ParamField>
+
+```javascript
+faker.helpers.slugify('Hello world!')
+// 'Hello-world'
+```
+
+---
+
+## Object and enum utilities
+
+### objectKey
+
+Returns a random key from the given object.
+
+<ParamField path="object" type="Record<string, unknown>" required>
+  The object to pick a key from. Must not be empty.
+</ParamField>
+
+```javascript
+faker.helpers.objectKey({ Cheetah: 120, Falcon: 390, Snail: 0.03 })
+// 'Falcon'
+```
+
+---
+
+### objectValue
+
+Returns a random value from the given object.
+
+<ParamField path="object" type="Record<string, unknown>" required>
+  The object to pick a value from. Must not be empty.
+</ParamField>
+
+```javascript
+faker.helpers.objectValue({ Cheetah: 120, Falcon: 390, Snail: 0.03 })
+// 390
+```
+
+---
+
+### enumValue
+
+Returns a random value from a TypeScript enum. Numeric reverse-mapping keys added by TypeScript are automatically ignored.
+
+<ParamField path="enumObject" type="Record<string | number, string | number>" required>
+  The enum object to pick a value from.
+</ParamField>
+
+```javascript
+enum Color { Red, Green, Blue }
+faker.helpers.enumValue(Color)
+// 1  (Green)
+
+enum Direction { North = 'North', South = 'South' }
+faker.helpers.enumValue(Direction)
+// 'South'
+
+enum HttpStatus { Ok = 200, Created = 201, BadRequest = 400, Unauthorized = 401 }
+faker.helpers.enumValue(HttpStatus)
+// 200  (Ok)
+```
+
+---
+
+## Conditional and range utilities
+
+### maybe
+
+Calls the given callback and returns its result with the given probability. Returns `undefined` otherwise.
+
+<ParamField path="callback" type="() => TResult" required>
+  The function to call if the probability check passes.
+</ParamField>
+
+<ParamField path="options.probability" type="number">
+  Probability of invoking the callback, between `0.0` and `1.0`. Defaults to `0.5`.
+</ParamField>
+
+```javascript
+faker.helpers.maybe(() => 'Hello World!')
+// 'Hello World!'
+
+faker.helpers.maybe(() => 'Hello World!', { probability: 0.1 })
+// undefined
+
+faker.helpers.maybe(() => 'Hello World!', { probability: 0.9 })
+// 'Hello World!'
+```
+
+---
+
+### rangeToNumber
+
+Converts a fixed number or a `{ min, max }` range object to a single random number. Used internally by many Faker methods.
+
+<ParamField path="numberOrRange" type="number | { min: number; max: number }" required>
+  A fixed number or a range object.
+</ParamField>
+
+```javascript
+faker.helpers.rangeToNumber(1)
+// 1
+
+faker.helpers.rangeToNumber({ min: 1, max: 10 })
+// 5
+```

@@ -1,0 +1,116 @@
+---
+title: "faker.vehicle — car makes, models, and VINs"
+description: "Generate vehicle makes, models, types, fuel types, colors, VINs, and manufacturer names for automotive app testing with faker.vehicle."
+---
+
+The `faker.vehicle` module generates automotive data: full vehicle names, manufacturers, models, body types, fuel types, colors, VINs, and UK-style vehicle registration marks (VRMs). It also includes bicycle types for two-wheeled vehicles.
+
+## vehicle()
+
+Returns a random vehicle name combining a manufacturer and model.
+
+```typescript
+faker.vehicle.vehicle()
+// 'BMW Explorer'
+```
+
+## manufacturer()
+
+Returns a random vehicle manufacturer name.
+
+```typescript
+faker.vehicle.manufacturer()
+// 'Ford'
+```
+
+## model()
+
+Returns a random vehicle model name.
+
+```typescript
+faker.vehicle.model()
+// 'Explorer'
+```
+
+## type()
+
+Returns a random vehicle body type.
+
+```typescript
+faker.vehicle.type()
+// 'Coupe'
+```
+
+## fuel()
+
+Returns a random fuel type.
+
+```typescript
+faker.vehicle.fuel()
+// 'Electric'
+```
+
+## vin()
+
+Returns a random 17-character Vehicle Identification Number (VIN). The VIN excludes the letters `I`, `O`, and `Q` per the ISO 3779 standard.
+
+```typescript
+faker.vehicle.vin()
+// 'YV1MH682762184654'
+```
+
+## color()
+
+Returns a random vehicle color (delegates to `faker.color.human()`).
+
+```typescript
+faker.vehicle.color()
+// 'red'
+```
+
+## vrm()
+
+Returns a random UK-style Vehicle Registration Mark (VRM) in the format `AA00AAA`.
+
+```typescript
+faker.vehicle.vrm()
+// 'MF56UPA'
+```
+
+## bicycle()
+
+Returns a random bicycle type.
+
+```typescript
+faker.vehicle.bicycle()
+// 'Adventure Road Bicycle'
+```
+
+## Usage example
+
+```typescript
+import { faker } from '@faker-js/faker';
+
+// Generate a fake vehicle listing
+const listing = {
+  make: faker.vehicle.manufacturer(),
+  model: faker.vehicle.model(),
+  type: faker.vehicle.type(),
+  fuel: faker.vehicle.fuel(),
+  color: faker.vehicle.color(),
+  vin: faker.vehicle.vin(),
+  registration: faker.vehicle.vrm(),
+  year: faker.number.int({ min: 2010, max: 2024 }),
+};
+
+// {
+//   make: 'Ford',
+//   model: 'Explorer',
+//   type: 'Coupe',
+//   fuel: 'Electric',
+//   color: 'red',
+//   vin: 'YV1MH682762184654',
+//   registration: 'MF56UPA',
+//   year: 2019
+// }
+```

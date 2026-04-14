@@ -1,0 +1,579 @@
+---
+title: "faker.internet — emails, URLs, usernames, and IPs"
+description: "Generate realistic internet data including emails, usernames, URLs, IP addresses, passwords, and MAC addresses with faker.internet."
+---
+
+The `faker.internet` module generates data commonly used in web applications — email addresses, usernames, URLs, IP addresses, passwords, MAC addresses, HTTP metadata, and more. You also have access to technical web request fields like user agents, JWT tokens, and HTTP status codes.
+
+<Warning>
+Generated email addresses could coincidentally be real addresses. Do not use them for sending actual email. Use `exampleEmail()` instead if you need addresses that are guaranteed safe for testing.
+</Warning>
+
+## Email
+
+### email
+
+Generates an email address using the given person's name as a base.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="firstName" type="string">
+      First name to use in the local part. Defaults to `faker.person.firstName()`.
+    </ParamField>
+    <ParamField body="lastName" type="string">
+      Last name to use in the local part. Defaults to `faker.person.lastName()`.
+    </ParamField>
+    <ParamField body="provider" type="string">
+      The mail provider domain (e.g. `'gmail.com'`). Defaults to a randomly chosen free mail provider.
+    </ParamField>
+    <ParamField body="allowSpecialCharacters" type="boolean" default="false">
+      When `true`, special characters such as `.!#$%&'*+-/=?^_{}~` may appear in the local part.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.internet.email()
+// 'Kassandra4@hotmail.com'
+
+faker.internet.email({ firstName: 'Jeanne' })
+// 'Jeanne63@yahoo.com'
+
+faker.internet.email({ firstName: 'Jeanne', lastName: 'Doe' })
+// 'Jeanne.Doe63@yahoo.com'
+
+faker.internet.email({ firstName: 'Jeanne', lastName: 'Doe', provider: 'example.fakerjs.dev' })
+// 'Jeanne_Doe88@example.fakerjs.dev'
+
+faker.internet.email({ firstName: 'Jeanne', lastName: 'Doe', provider: 'example.fakerjs.dev', allowSpecialCharacters: true })
+// 'Jeanne%Doe88@example.fakerjs.dev'
+```
+
+---
+
+### exampleEmail
+
+Generates a safe email address using an `example.com`, `example.net`, or `example.org` domain. These domains are reserved for documentation and testing and will never be real inboxes.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="firstName" type="string">
+      First name to use in the local part. Defaults to `faker.person.firstName()`.
+    </ParamField>
+    <ParamField body="lastName" type="string">
+      Last name to use in the local part. Defaults to `faker.person.lastName()`.
+    </ParamField>
+    <ParamField body="allowSpecialCharacters" type="boolean" default="false">
+      When `true`, special characters may appear in the local part.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.internet.exampleEmail()
+// 'Helmer.Graham23@example.com'
+
+faker.internet.exampleEmail({ firstName: 'Jeanne' })
+// 'Jeanne96@example.net'
+
+faker.internet.exampleEmail({ firstName: 'Jeanne', lastName: 'Doe' })
+// 'Jeanne_Doe96@example.net'
+
+faker.internet.exampleEmail({ firstName: 'Jeanne', lastName: 'Doe', allowSpecialCharacters: true })
+// 'Jeanne%Doe88@example.com'
+```
+
+---
+
+## Usernames and display names
+
+### username
+
+Generates a plain ASCII username using the given person's name as a base. Accented and non-Latin characters are transliterated or replaced.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="firstName" type="string">
+      First name to use. Defaults to `faker.person.firstName()`.
+    </ParamField>
+    <ParamField body="lastName" type="string">
+      Last name to use. Defaults to `faker.person.lastName()`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.internet.username()
+// 'Nettie_Zboncak40'
+
+faker.internet.username({ firstName: 'Jeanne', lastName: 'Doe' })
+// 'Jeanne_Doe98'
+
+faker.internet.username({ firstName: 'Hélene', lastName: 'Müller' })
+// 'Helene_Muller11'
+
+faker.internet.username({ firstName: 'Фёдор', lastName: 'Достоевский' })
+// 'Fedor.Dostoevskii50'
+
+faker.internet.username({ firstName: '大羽', lastName: '陳' })
+// 'hlzp8d.tpv45'  — non-Latin names fall back to encoded values
+```
+
+---
+
+### displayName
+
+Generates a display name that may contain Unicode characters. Unlike `username()`, the result is not restricted to ASCII.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="firstName" type="string">
+      First name to use. Defaults to `faker.person.firstName()`.
+    </ParamField>
+    <ParamField body="lastName" type="string">
+      Last name to use. Defaults to `faker.person.lastName()`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.internet.displayName()
+// 'Nettie_Zboncak40'
+
+faker.internet.displayName({ firstName: 'Hélene', lastName: 'Müller' })
+// 'Hélene_Müller11'
+
+faker.internet.displayName({ firstName: 'Фёдор', lastName: 'Достоевский' })
+// 'Фёдор.Достоевский50'
+
+faker.internet.displayName({ firstName: '大羽', lastName: '陳' })
+// '大羽.陳'
+```
+
+---
+
+## URLs and domains
+
+### url
+
+Generates a random HTTP or HTTPS URL.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="appendSlash" type="boolean">
+      Whether to append a trailing slash. Defaults to a random boolean.
+    </ParamField>
+    <ParamField body="protocol" type="'http' | 'https'" default="'https'">
+      The URL scheme to use.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.internet.url()
+// 'https://remarkable-hackwork.info'
+
+faker.internet.url({ appendSlash: true })
+// 'https://slow-timer.info/'
+
+faker.internet.url({ protocol: 'http', appendSlash: false })
+// 'http://www.terrible-idea.com'
+```
+
+---
+
+### domainName
+
+Generates a random domain name.
+
+**Returns:** `string`
+
+```typescript
+faker.internet.domainName()  // 'slow-timer.info'
+```
+
+---
+
+### domainSuffix
+
+Returns a random domain suffix (TLD).
+
+**Returns:** `string`
+
+```typescript
+faker.internet.domainSuffix()  // 'com'
+faker.internet.domainSuffix()  // 'name'
+```
+
+---
+
+### domainWord
+
+Generates a random hyphenated domain word suitable for use in a hostname.
+
+**Returns:** `string`
+
+```typescript
+faker.internet.domainWord()  // 'close-reality'
+faker.internet.domainWord()  // 'weird-cytoplasm'
+```
+
+---
+
+## IP addresses
+
+### ip
+
+Generates a random IPv4 or IPv6 address with equal probability.
+
+**Returns:** `string`
+
+```typescript
+faker.internet.ip()  // '245.108.222.0'
+faker.internet.ip()  // '4e5:f9c5:4337:abfd:9caf:1135:41ad:d8d3'
+```
+
+---
+
+### ipv4
+
+Generates a random IPv4 address. You can constrain the result to a specific CIDR block or named network.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="cidrBlock" type="string" default="'0.0.0.0/0'">
+      A CIDR block in `x.x.x.x/y` format. The generated IP falls within this range.
+    </ParamField>
+    <ParamField body="network" type="string" default="'any'">
+      A named network alias. Available values: `'any'`, `'loopback'`, `'private-a'`, `'private-b'`, `'private-c'`, `'test-net-1'`, `'test-net-2'`, `'test-net-3'`, `'link-local'`, `'multicast'`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.internet.ipv4()
+// '245.108.222.0'
+
+faker.internet.ipv4({ cidrBlock: '192.168.0.0/16' })
+// '192.168.215.224'
+
+faker.internet.ipv4({ network: 'private-a' })
+// '10.199.154.205'
+```
+
+---
+
+### ipv6
+
+Generates a random IPv6 address.
+
+**Returns:** `string`
+
+```typescript
+faker.internet.ipv6()  // '269f:1230:73e3:318d:842b:daab:326d:897b'
+```
+
+---
+
+### port
+
+Generates a random port number between 0 and 65535.
+
+**Returns:** `number`
+
+```typescript
+faker.internet.port()  // 9414
+```
+
+---
+
+## Network hardware
+
+### mac
+
+Generates a random MAC address.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="separator" type="string" default="':'">
+      The byte separator character. Accepts `':'`, `'-'`, or `''` (no separator). Any other value falls back to `':'`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.internet.mac()                        // '32:8e:2e:09:c6:05'
+faker.internet.mac({ separator: '-' })      // '32-8e-2e-09-c6-05'
+faker.internet.mac({ separator: '' })       // '328e2e09c605'
+```
+
+---
+
+## Passwords
+
+### password
+
+Generates a random password-like string.
+
+<Warning>
+This method is not cryptographically secure. Do not use it to generate real user passwords.
+</Warning>
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="length" type="number" default="15">
+      Length of the generated password.
+    </ParamField>
+    <ParamField body="memorable" type="boolean" default="false">
+      When `true`, generates a pronounceable password by alternating consonants and vowels. The `pattern` option is ignored when this is `true`.
+    </ParamField>
+    <ParamField body="pattern" type="RegExp" default="/\w/">
+      A regular expression that each character must match. Ignored when `memorable` is `true`.
+    </ParamField>
+    <ParamField body="prefix" type="string" default="''">
+      A string prepended to the generated password.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.internet.password()
+// '89G1wJuBLbGziIs'
+
+faker.internet.password({ length: 20 })
+// 'aF55c_8O9kZaPOrysFB_'
+
+faker.internet.password({ length: 20, memorable: true })
+// 'lawetimufozujosodedi'
+
+faker.internet.password({ length: 20, memorable: true, pattern: /[A-Z]/ })
+// 'HMAQDFFYLDDUTBKVNFVS'
+
+faker.internet.password({ length: 20, memorable: true, pattern: /[A-Z]/, prefix: 'Hello ' })
+// 'Hello IREOXTDWPERQSB'
+```
+
+---
+
+## User agents
+
+### userAgent
+
+Generates a random browser user agent string.
+
+**Returns:** `string`
+
+```typescript
+faker.internet.userAgent()
+// 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_1 like Mac OS X) AppleWebKit/537.19.86 (KHTML, like Gecko) Version/18_3 Mobile/15E148 Safari/598.43'
+```
+
+---
+
+## Emoji
+
+### emoji
+
+Generates a random emoji character.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="types" type="EmojiType[]">
+      A list of emoji categories to draw from. Available values: `'smiley'`, `'body'`, `'person'`, `'nature'`, `'food'`, `'travel'`, `'activity'`, `'object'`, `'symbol'`, `'flag'`. Defaults to all categories.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.internet.emoji()
+// '🥰'
+
+faker.internet.emoji({ types: ['food', 'nature'] })
+// '🥐'
+```
+
+---
+
+## HTTP
+
+### httpMethod
+
+Returns a random HTTP method.
+
+Possible values: `GET`, `POST`, `PUT`, `DELETE`, `PATCH`.
+
+**Returns:** `'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'`
+
+```typescript
+faker.internet.httpMethod()  // 'PATCH'
+```
+
+---
+
+### httpStatusCode
+
+Generates a random HTTP status code.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="types" type="HTTPStatusCodeType[]">
+      A list of status code categories to draw from. Available values: `'informational'`, `'success'`, `'redirection'`, `'clientError'`, `'serverError'`. Defaults to all categories.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `number`
+
+```typescript
+faker.internet.httpStatusCode()
+// 200
+
+faker.internet.httpStatusCode({ types: ['success', 'serverError'] })
+// 500
+```
+
+---
+
+## JWT
+
+### jwt
+
+Generates a random JSON Web Token (JWT). The signature is randomly generated and not cryptographically valid.
+
+<ParamField body="options" type="object">
+  <Expandable title="options properties">
+    <ParamField body="header" type="Record<string, unknown>">
+      Custom header object. Replaces the default `{ alg, typ }` header entirely when provided.
+    </ParamField>
+    <ParamField body="payload" type="Record<string, unknown>">
+      Custom payload object. Replaces the default claims (`iat`, `exp`, `nbf`, `iss`, `sub`, `aud`, `jti`) entirely when provided.
+    </ParamField>
+    <ParamField body="refDate" type="string | Date | number">
+      Reference date used when generating relative date fields (`iat`, `exp`, `nbf`). Defaults to `faker.defaultRefDate()`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Returns:** `string`
+
+```typescript
+faker.internet.jwt()
+// 'eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3...'
+
+faker.internet.jwt({ header: { alg: 'HS256' } })
+// 'eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3...'
+
+faker.internet.jwt({ payload: { iss: 'Acme' } })
+// 'eyJhbGciOiJFUzM4NCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBY21lIn0...'
+
+faker.internet.jwt({ refDate: '2020-01-01T00:00:00.000Z' })
+// 'eyJhbGciOiJFUzM4NCIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1Nzc4...'
+```
+
+<Note>
+The generated JWT has a valid base64url-encoded header and payload, but its signature is a random alphanumeric string. It will not pass cryptographic verification.
+</Note>
+
+---
+
+## Examples
+
+<AccordionGroup>
+  <Accordion title="Generate a complete user account">
+    ```typescript
+    import { faker } from '@faker-js/faker';
+
+    const account = {
+      username: faker.internet.username(),
+      email: faker.internet.exampleEmail(),
+      password: faker.internet.password({ length: 20 }),
+      avatar: faker.image.avatar(),
+      website: faker.internet.url(),
+    };
+
+    // {
+    //   username: 'Nettie_Zboncak40',
+    //   email: 'Helmer.Graham23@example.com',
+    //   password: 'aF55c_8O9kZaPOrysFB_',
+    //   avatar: 'https://avatars.githubusercontent.com/u/...',
+    //   website: 'https://remarkable-hackwork.info'
+    // }
+    ```
+  </Accordion>
+
+  <Accordion title="Generate network interface data">
+    ```typescript
+    import { faker } from '@faker-js/faker';
+
+    const networkInterface = {
+      mac: faker.internet.mac(),
+      ipv4: faker.internet.ipv4({ network: 'private-c' }),
+      ipv6: faker.internet.ipv6(),
+      port: faker.internet.port(),
+    };
+
+    // {
+    //   mac: '32:8e:2e:09:c6:05',
+    //   ipv4: '192.168.215.224',
+    //   ipv6: '269f:1230:73e3:318d:842b:daab:326d:897b',
+    //   port: 9414
+    // }
+    ```
+  </Accordion>
+
+  <Accordion title="Generate HTTP request data">
+    ```typescript
+    import { faker } from '@faker-js/faker';
+
+    const request = {
+      method: faker.internet.httpMethod(),
+      url: faker.internet.url(),
+      userAgent: faker.internet.userAgent(),
+      statusCode: faker.internet.httpStatusCode({ types: ['success'] }),
+    };
+
+    // {
+    //   method: 'POST',
+    //   url: 'https://slow-timer.info/',
+    //   userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_1 ...',
+    //   statusCode: 200
+    // }
+    ```
+  </Accordion>
+
+  <Accordion title="Generate a mock JWT for testing">
+    ```typescript
+    import { faker } from '@faker-js/faker';
+
+    faker.seed(42);
+    faker.setDefaultRefDate(new Date('2024-01-01'));
+
+    const token = faker.internet.jwt({
+      header: { alg: 'HS256', typ: 'JWT' },
+      payload: {
+        sub: faker.string.uuid(),
+        iss: 'my-app',
+        aud: 'api.my-app.com',
+      },
+    });
+    ```
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,186 @@
+---
+title: "Faker class: main entry point for fake data"
+description: "Complete reference for the Faker class and default faker instance. Covers constructor options, all 27 module properties, seed(), and getMetadata()."
+---
+
+`Faker` is the main class for generating fake data. The default `faker` export is a pre-built English instance ready to use with no setup. Use `new Faker({ locale })` only when you need a custom locale or a specific fallback chain.
+
+## Quick usage
+
+<CodeGroup>
+
+```typescript ESM
+import { faker } from '@faker-js/faker';
+
+faker.person.fullName(); // 'John Doe'
+faker.internet.email();  // 'john.doe@example.com'
+```
+
+```javascript CJS
+const { faker } = require('@faker-js/faker');
+
+faker.person.fullName(); // 'John Doe'
+faker.internet.email();  // 'john.doe@example.com'
+```
+
+</CodeGroup>
+
+<Note>
+For tree-shaking and smaller bundles, import from a locale-specific path:
+
+```typescript
+import { faker } from '@faker-js/faker/locale/en';
+```
+
+This loads only the English locale data and cuts out all other locale definitions.
+</Note>
+
+## Constructor
+
+Use the constructor when you need a custom locale, a fallback chain, or a specific randomizer. For most use cases a pre-built instance such as `faker`, `fakerDE`, or `fakerES_MX` is sufficient.
+
+```typescript
+import { Faker, de, de_AT, en, base } from '@faker-js/faker';
+
+const customFaker = new Faker({ locale: [de_AT, de, en, base] });
+
+customFaker.person.firstName(); // 'Gerhard'
+customFaker.location.city();    // 'Wien'
+```
+
+### Options
+
+<ParamField body="locale" type="LocaleDefinition | LocaleDefinition[]" required>
+  The locale data to use. Pass an array to define a fallback chain — Faker uses the first locale that has data for each requested property. Include `base` at the end to cover locale-independent entries.
+
+  ```typescript
+  // Single locale
+  new Faker({ locale: de });
+
+  // Fallback chain: de_AT → de → en → base
+  new Faker({ locale: [de_AT, de, en, base] });
+  ```
+</ParamField>
+
+<ParamField body="randomizer" type="Randomizer">
+  A custom randomizer to use instead of Faker's default Mersenne Twister (53-bit). Use this when you want to share a random generator with another library or tool.
+
+  ```typescript
+  import { generateMersenne32Randomizer } from '@faker-js/faker';
+
+  const randomizer = generateMersenne32Randomizer();
+  const customFaker = new Faker({ locale: en, randomizer });
+  ```
+</ParamField>
+
+<ParamField body="seed" type="number | number[]">
+  An initial seed for reproducible output. Equivalent to calling `faker.seed(n)` immediately after construction.
+
+  ```typescript
+  const seededFaker = new Faker({ locale: en, seed: 42 });
+  seededFaker.number.int(100); // always the same value for seed 42
+  ```
+</ParamField>
+
+## Module properties
+
+`Faker` exposes 27 module properties. The three locale-independent modules (`datatype`, `number`, `string`) are inherited from `SimpleFaker` and work without any locale data loaded.
+
+| Module | Description |
+|---|---|
+| `airline` | Flight numbers, seat codes, IATA airport codes, and aircraft types |
+| `animal` | Names for cats, dogs, birds, fish, and many more species |
+| `book` | Titles, authors, genres, publishers, and formats |
+| `color` | Color names, hex codes, RGB values, and CSS color functions |
+| `commerce` | Product names, departments, prices, and ISBNs |
+| `company` | Company names, buzzwords, and catch phrases |
+| `database` | Column types, engines, collations, and DBMS names |
+| `date` | Dates in the past or future, birthdays, month names, and weekday names |
+| `datatype` | Primitive boolean values |
+| `finance` | Account numbers, IBANs, credit card numbers, and currency codes |
+| `food` | Dish names, ingredients, descriptions, and ethnic categories |
+| `git` | Commit messages, branch names, author names, and commit SHAs |
+| `hacker` | Tech jargon, abbreviations, and hacker-speak phrases |
+| `helpers` | Utilities for arrays, objects, and mustache-style templates |
+| `image` | Image URLs from placeholder services |
+| `internet` | Emails, usernames, passwords, URLs, IP addresses, and MAC addresses |
+| `location` | Addresses, cities, countries, zip codes, and coordinates |
+| `lorem` | Placeholder words, sentences, and paragraphs |
+| `music` | Song names, genres, and artist names |
+| `number` | Integers, floats, hex values, and big integers |
+| `person` | First names, last names, full names, job titles, and pronouns |
+| `phone` | Phone numbers in local and international formats |
+| `science` | Chemical element names, symbols, and SI units |
+| `string` | UUIDs, alphanumeric strings, nanoids, and hexadecimal strings |
+| `system` | File names, MIME types, file extensions, and directory paths |
+| `vehicle` | Vehicle makes, models, fuel types, and VINs |
+| `word` | Individual adjectives, nouns, verbs, and sample words |
+
+## Methods
+
+### seed()
+
+Sets the seed for the random number generator to produce reproducible output. Generated values depend on both the seed and the number of calls made since it was set.
+
+```typescript
+faker.seed(42);
+faker.number.int(10); // 4
+faker.number.int(10); // 10
+
+faker.seed(42);
+faker.number.int(10); // 4  ← same as before
+faker.number.int(10); // 10 ← same as before
+```
+
+Pass an array for additional entropy:
+
+```typescript
+faker.seed([42, 13, 17]);
+faker.number.int(10); // 3
+```
+
+Call `seed()` with no argument to generate a random seed and get back its value — useful for logging and reproducing failing tests:
+
+```typescript
+const seed = faker.seed();
+console.log('seed:', seed); // seed: 3487219384
+```
+
+<ParamField body="seed" type="number | number[]">
+  The seed value. Pass a single number or an array of numbers. Omit to generate a random seed. Returns the seed that was set.
+</ParamField>
+
+### setDefaultRefDate()
+
+Sets the reference date used as "now" when generating relative dates such as `faker.date.past()` or `faker.date.future()`. Defaults to `() => new Date()` evaluated at call time.
+
+Use this together with `seed()` to make date generation fully reproducible:
+
+```typescript
+faker.seed(1234);
+faker.setDefaultRefDate(new Date('2020-01-01'));
+
+faker.date.past(); // always '2019-07-03T08:27:58.118Z' for this seed + refDate
+```
+
+<ParamField body="dateOrSource" type="string | Date | number | (() => Date)" default="() => new Date()">
+  A static value (date string, `Date` object, or Unix timestamp in milliseconds) or a function that returns a fresh `Date` on each call. Omit or pass `undefined` to restore the default behavior.
+</ParamField>
+
+### getMetadata()
+
+Returns an object describing the locale loaded in this `Faker` instance.
+
+```typescript
+import { faker, fakerES_MX } from '@faker-js/faker';
+
+faker.getMetadata();
+// { title: 'English', code: 'en', language: 'en', endonym: 'English', dir: 'ltr', script: 'Latn' }
+
+fakerES_MX.getMetadata();
+// { title: 'Spanish (Mexico)', code: 'es_MX', language: 'es', endonym: 'Español (México)', dir: 'ltr', script: 'Latn', country: 'MX' }
+```
+
+<Note>
+`getMetadata()` is only available on `Faker`, not on `SimpleFaker`. If the loaded locale does not define metadata, an empty object is returned.
+</Note>

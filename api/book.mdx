@@ -1,0 +1,90 @@
+---
+title: "faker.book — titles, authors, genres, and publishers"
+description: "Generate book titles, author names, genres, series names, publisher names, and book formats for library and publishing app testing."
+---
+
+The `faker.book` module generates data for books and publishing: titles, author names, genres, series names, publisher names, and physical formats. All values may be localized. For ISBNs, use `faker.commerce.isbn()`.
+
+<Note>
+`faker.book.author()` returns names of real, well-known authors. To generate a fictional author name instead, use `faker.person.fullName()`.
+</Note>
+
+## title()
+
+Returns a random book title.
+
+```typescript
+faker.book.title()
+// 'Romeo and Juliet'
+```
+
+## author()
+
+Returns a random existing author name.
+
+```typescript
+faker.book.author()
+// 'William Shakespeare'
+```
+
+## genre()
+
+Returns a random book genre.
+
+```typescript
+faker.book.genre()
+// 'Fantasy'
+```
+
+## series()
+
+Returns a random book series name.
+
+```typescript
+faker.book.series()
+// 'Harry Potter'
+```
+
+## publisher()
+
+Returns a random publisher name.
+
+```typescript
+faker.book.publisher()
+// 'Addison-Wesley'
+```
+
+## format()
+
+Returns a random book format (e.g. hardcover, paperback, ebook).
+
+```typescript
+faker.book.format()
+// 'Hardcover'
+```
+
+## Usage example
+
+```typescript
+import { faker } from '@faker-js/faker';
+
+const book = {
+  title: faker.book.title(),
+  author: faker.book.author(),
+  genre: faker.book.genre(),
+  series: faker.book.series(),
+  publisher: faker.book.publisher(),
+  format: faker.book.format(),
+  isbn: faker.commerce.isbn(),
+};
+
+// {
+//   title: 'Romeo and Juliet',
+//   author: 'William Shakespeare',
+//   genre: 'Fantasy',
+//   series: 'Harry Potter',
+//   publisher: 'Addison-Wesley',
+//   format: 'Hardcover',
+//   isbn: '978-1-234-56789-7'
+// }
+```

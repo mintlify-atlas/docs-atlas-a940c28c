@@ -1,0 +1,92 @@
+---
+title: "faker.database — SQL column names, types, and engines"
+description: "Generate database column names, column types, table collations, database engines, and MongoDB ObjectId strings for schema and seed testing with faker.database."
+---
+
+The `faker.database` module generates data that mirrors relational database schema concepts: column names, data types, collations, and storage engines. It also provides MongoDB-compatible ObjectIds for NoSQL testing.
+
+## column()
+
+Returns a random database column name.
+
+```typescript
+faker.database.column()
+// 'createdAt'
+```
+
+## type()
+
+Returns a random SQL column type.
+
+```typescript
+faker.database.type()
+// 'timestamp'
+```
+
+## collation()
+
+Returns a random database collation string.
+
+```typescript
+faker.database.collation()
+// 'utf8_unicode_ci'
+```
+
+## engine()
+
+Returns a random database storage engine name.
+
+```typescript
+faker.database.engine()
+// 'ARCHIVE'
+```
+
+## mongodbObjectId()
+
+Returns a random MongoDB-compatible [ObjectId](https://docs.mongodb.com/manual/reference/method/ObjectId/) as a 24-character lowercase hexadecimal string.
+
+```typescript
+faker.database.mongodbObjectId()
+// 'e175cac316a79afdd0ad3afb'
+```
+
+## Usage example
+
+```typescript
+import { faker } from '@faker-js/faker';
+
+// Generate a fake table schema definition
+const columns = Array.from({ length: 4 }, () => ({
+  name: faker.database.column(),
+  type: faker.database.type(),
+}));
+
+const schema = {
+  engine: faker.database.engine(),
+  collation: faker.database.collation(),
+  columns,
+};
+
+// {
+//   engine: 'InnoDB',
+//   collation: 'utf8_unicode_ci',
+//   columns: [
+//     { name: 'id', type: 'int' },
+//     { name: 'createdAt', type: 'timestamp' },
+//     { name: 'title', type: 'varchar' },
+//     { name: 'status', type: 'enum' },
+//   ]
+// }
+```
+
+<Tip>
+To generate a MongoDB document ID, use `mongodbObjectId()`:
+
+```typescript
+const doc = {
+  _id: faker.database.mongodbObjectId(),
+  name: faker.person.fullName(),
+};
+// { _id: 'e175cac316a79afdd0ad3afb', name: 'Jane Smith' }
+```
+</Tip>

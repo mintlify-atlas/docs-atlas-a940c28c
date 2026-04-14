@@ -1,0 +1,147 @@
+---
+title: "Upgrade Guide: Migrating to Faker v10"
+description: "Step-by-step guide to upgrading to Faker v10, including Node.js version requirements, renamed modules, and breaking changes from v8 and v9."
+---
+
+Faker v10 was released on August 21, 2025. It removes all methods that were deprecated in v9, switches to ESM-only output, and raises the minimum supported Node.js version. This guide covers everything you need to change when upgrading from v9.
+
+<Info>
+  If you are upgrading from v8 or earlier, first upgrade to the latest v9 release and follow the [v9 migration guide](https://v9.fakerjs.dev/guide/upgrading.html), then return here to complete the upgrade to v10.
+</Info>
+
+## Node.js version requirements
+
+Faker v10 requires one of the following Node.js versions:
+
+| Version | Minimum release |
+|---|---|
+| Node 20 | 20.19.0 |
+| Node 22 | 22.13.0 |
+| Node 23 | 23.5.0 |
+| Node 24 | 24.0.0 (any release) |
+
+Node 18 has reached end-of-life and is no longer supported.
+
+<Steps>
+  <Step title="Check your current Node.js version">
+    ```bash
+    node --version
+    ```
+  </Step>
+  <Step title="Upgrade Node.js if needed">
+    Use [nvm](https://github.com/nvm-sh/nvm), [fnm](https://github.com/Schniz/fnm), or your system package manager to install a supported version.
+  </Step>
+  <Step title="Install Faker v10">
+    ```bash
+    npm install --save-dev @faker-js/faker@10
+    ```
+  </Step>
+</Steps>
+
+## ESM-only package
+
+Faker v10 ships ESM-only output. Most projects are unaffected because Node.js 20.19+ and 22.13+ can `require()` ESM packages directly.
+
+```typescript
+// CommonJS require still works on supported Node.js versions
+const { faker, fakerES } = require('@faker-js/faker');
+```
+
+If your Node.js version is too old, you will see:
+
+```
+Error [ERR_REQUIRE_ESM]: require() of ES Module .../faker/dist/index.js not supported.
+```
+
+Upgrade Node.js to a supported version to resolve this error.
+
+### TypeScript moduleResolution
+
+The switch to ESM-only also affects which `moduleResolution` values are valid in your `tsconfig.json`.
+
+| Project type | v9 supported values | v10 supported values |
+|---|---|---|
+| ESM | `Bundler`, `Node10`, `Node16`, `Node20`, `NodeNext` | `Bundler`, `Node10`, `Node16`, `Node20`, `NodeNext` |
+| CJS | `Bundler`, `Node10`, `Node16`, `NodeNext` | `Bundler`, `Node20`, `NodeNext` |
+
+<Warning>
+  `"Node20"` requires TypeScript 5.9.0 or later. If you are on an older TypeScript version, use `"NodeNext"` instead.
+</Warning>
+
+### Jest and CommonJS
+
+Jest uses its own module resolution and has known compatibility issues with ESM packages. If you use Jest with CJS, apply the following changes to your `jest.config.ts`:
+
+```typescript
+// Transform both .ts and .js files — needed to transform @faker-js
+transform: {
+  '^.+\\.(t|j)s$': 'ts-jest',
+},
+
+// Exclude node_modules from transformation, except @faker-js
+transformIgnorePatterns: [
+  // npm
+  'node_modules/(?!@faker-js).+',
+
+  // pnpm
+  'node_modules/.pnpm/.+/node_modules/(?!@faker-js).+'
+],
+```
+
+If these changes do not resolve the issue, see [issue #3606](https://github.com/faker-js/faker/issues/3606) for additional workarounds. If nothing works, stay on Faker v9 until Jest adds full ESM support.
+
+## Removed deprecated methods
+
+All methods that were deprecated in v9 have been removed in v10. Before upgrading, install the latest v9 release and fix any deprecation warnings in your codebase.
+
+```bash
+npm install --save-dev @faker-js/faker@9
+```
+
+The following removed methods have direct replacements:
+
+| Removed | Replacement |
+|---|---|
+| `faker.address.*` | `faker.location.*` |
+| `faker.name.*` | `faker.person.*` |
+| `faker.internet.userName` | `faker.internet.username` |
+
+The following removed methods require more consideration:
+
+| Removed | Replacement / Notes |
+|---|---|
+| `faker.internet.color` | `faker.color.rgb` |
+| `faker.image.urlPlaceholder` | `faker.image.dataUri` |
+| `faker.finance.maskedNumber` | See [PR #3201](https://github.com/faker-js/faker/pull/3201) for migration options |
+| `faker.image.avatarLegacy` | `faker.image.avatar` |
+
+## Word module default strategy change
+
+The default resolution strategy for all `faker.word.*` methods changed from returning a random word of any length to throwing an error when no words match the criteria you provided.
+
+```typescript
+// In v9: returned a random noun, ignoring the length requirement
+// In v10: throws FakerError: No words found that match the given length.
+faker.word.noun({ length: { min: 20, max: 25 } });
+```
+
+To restore the v9 behavior, pass `strategy: 'any-length'` explicitly:
+
+| Method | v10 equivalent with v9 behavior |
+|---|---|
+| `faker.word.adjective()` | `faker.word.adjective({ strategy: 'any-length' })` |
+| `faker.word.adverb()` | `faker.word.adverb({ strategy: 'any-length' })` |
+| `faker.word.conjunction()` | `faker.word.conjunction({ strategy: 'any-length' })` |
+| `faker.word.interjection()` | `faker.word.interjection({ strategy: 'any-length' })` |
+| `faker.word.noun()` | `faker.word.noun({ strategy: 'any-length' })` |
+| `faker.word.preposition()` | `faker.word.preposition({ strategy: 'any-length' })` |
+| `faker.word.sample()` | `faker.word.sample({ strategy: 'any-length' })` |
+| `faker.word.verb()` | `faker.word.verb({ strategy: 'any-length' })` |
+
+## Older migration guides
+
+- [Upgrading to v9](https://v9.fakerjs.dev/guide/upgrading.html)
+- [Upgrading to v8](https://v8.fakerjs.dev/guide/upgrading.html)
+- [Upgrading to v7](https://v7.fakerjs.dev/guide/upgrading.html)
+
+For a complete list of all changes in v10, see the [GitHub releases page](https://github.com/faker-js/faker/releases).

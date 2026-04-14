@@ -1,0 +1,170 @@
+---
+title: "faker.animal — animal types and species names"
+description: "Generate animal names by type including bear, bird, cat, cetacean, cow, crocodilia, dog, fish, horse, insect, lion, rabbit, rodent, snake, and more."
+---
+
+The `faker.animal` module generates animal names organized by taxonomic or common grouping. Use `type()` to get a generic animal category, or call a specific method such as `cat()` or `dog()` to get a breed or species name. All values may be localized.
+
+## type()
+
+Returns a random general animal type.
+
+```typescript
+faker.animal.type()
+// 'crocodile'
+```
+
+## petName()
+
+Returns a random pet name.
+
+```typescript
+faker.animal.petName()
+// 'Coco'
+```
+
+## bear()
+
+Returns a random bear species.
+
+```typescript
+faker.animal.bear()
+// 'Asian black bear'
+```
+
+## bird()
+
+Returns a random bird species.
+
+```typescript
+faker.animal.bird()
+// "Buller's Shearwater"
+```
+
+## cat()
+
+Returns a random cat breed.
+
+```typescript
+faker.animal.cat()
+// 'Singapura'
+```
+
+## cetacean()
+
+Returns a random cetacean species (whales, dolphins, and porpoises).
+
+```typescript
+faker.animal.cetacean()
+// 'Spinner Dolphin'
+```
+
+## cow()
+
+Returns a random cow species or breed.
+
+```typescript
+faker.animal.cow()
+// 'Brava'
+```
+
+## crocodilia()
+
+Returns a random crocodilian species.
+
+```typescript
+faker.animal.crocodilia()
+// 'Philippine Crocodile'
+```
+
+## dog()
+
+Returns a random dog breed.
+
+```typescript
+faker.animal.dog()
+// 'Irish Water Spaniel'
+```
+
+## fish()
+
+Returns a random fish species.
+
+```typescript
+faker.animal.fish()
+// 'Mandarin fish'
+```
+
+## horse()
+
+Returns a random horse breed.
+
+```typescript
+faker.animal.horse()
+// 'Swedish Warmblood'
+```
+
+## insect()
+
+Returns a random insect species.
+
+```typescript
+faker.animal.insect()
+// 'Pyramid ant'
+```
+
+## lion()
+
+Returns a random lion species.
+
+```typescript
+faker.animal.lion()
+// 'Northeast Congo Lion'
+```
+
+## rabbit()
+
+Returns a random rabbit species or breed.
+
+```typescript
+faker.animal.rabbit()
+// 'Florida White'
+```
+
+## rodent()
+
+Returns a random rodent species.
+
+```typescript
+faker.animal.rodent()
+// 'Cuscomys ashanika'
+```
+
+## snake()
+
+Returns a random snake species.
+
+```typescript
+faker.animal.snake()
+// 'Eyelash viper'
+```
+
+## Usage example
+
+```typescript
+import { faker } from '@faker-js/faker';
+
+const animals = [
+  { type: faker.animal.type(), name: faker.animal.petName() },
+  { type: 'dog', name: faker.animal.dog() },
+  { type: 'cat', name: faker.animal.cat() },
+  { type: 'bird', name: faker.animal.bird() },
+];
+
+// [
+//   { type: 'crocodile', name: 'Coco' },
+//   { type: 'dog', name: 'Irish Water Spaniel' },
+//   { type: 'cat', name: 'Singapura' },
+//   { type: 'bird', name: "Buller's Shearwater" }
+// ]
+```
